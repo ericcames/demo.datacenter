@@ -1,0 +1,6 @@
+---
+files:
+  - name: main.tf
+    template: main.tf.j2
+  - name: backend.tf
+    template: backend.tf.j2

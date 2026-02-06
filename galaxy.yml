@@ -1,0 +1,35 @@
+---
+authors:
+  - Eric Ames (ericcames)
+dependencies:
+  "ansible.posix": ">=2.1.0"
+  "ansible.utils": ">=6.0.0"
+  "ansible.platform": ">=2.6.20250924"
+  "ansible.hub": ">=1.0.2"
+  "ansible.controller": ">=4.7.4"
+  "ansible.eda": ">=2.10.0"
+  "infra.aap_configuration": ">=3.8.3"
+  "community.general": ">=12.0.1"
+  "containers.podman": ">=1.18.0"
+  "community.hashi_vault": ">=7.1.0"
+  "community.crypto": ">=3.0.5"
+license_file: LICENSE
+name: demo_datacenter
+description: A showcase to Configuration as Code. This repo is designed to have a repeatable build process for Terraform Entprise and Vault. We are leveraging the work that the Red Hat Product Demos team is doing.
+namespace: ericcames
+readme: README.md
+repository: https://github.com/ericcames/demo.datacenter
+issues: https://github.com/ericcames/demo.datacenter/issues
+tags:
+  - lab
+  - cloud
+  - amazon
+  - aws
+  - hashicorp
+  - dailydemo
+  - ansible
+  - automation
+  - sales
+  - terraform
+  - vault
+version: 1.0.0

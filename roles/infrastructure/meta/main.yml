@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  role_name: infrastructure
+  author: Eric Ames (ericcames)
+  description: creates infrastructure at AWS using terraform
+  license: MIT License
+  min_ansible_version: "2.16"

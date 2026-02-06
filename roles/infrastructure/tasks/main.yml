@@ -1,0 +1,281 @@
+---
+- name: Stuff we are always going to do
+  tags:
+    - always
+  block:
+
+    - name: Check to see if terraform is in the path
+      register: terraform_path
+      changed_when: false
+      ansible.builtin.command: terraform version
+
+    - name: If terraform_path.rc != 0, let the user know that terraform isn't installed and exit
+      when: terraform_path.rc != 0
+      ansible.builtin.fail:
+        msg: Terraform isn't installed. Please install Terraform before proceeding.
+
+- name: Provision our infrastructure
+  tags:
+    - create
+  block:
+
+    - name: Lookup the necessary AWS R53 hosted zone ID
+      block:
+
+        - name: List all hosted zones
+          register: hosted_zones
+          amazon.aws.route53_info:
+            query: hosted_zone
+            hosted_zone_method: list_by_name
+
+        - name: Debug hosted_zones, default false
+          when: debug | default(false)
+          ansible.builtin.debug:
+            var: hosted_zones
+
+        - name: If domain_name is specified, look for that zone ID
+          when: domain_name is defined
+          block:
+
+            - name: Set r53_zone_id fact with hosted_zones zone ID based on name
+              when: item.Name == ( domain_name ~ '.' )
+              loop: "{{ hosted_zones.HostedZones | flatten(levels=1) }}"
+              ansible.builtin.set_fact:
+                r53_zone_id: "{{ item.Id | replace('/hostedzone/', '') }}"
+
+            - name: Debug r53_zone_id, default false
+              when: debug | default(false)
+              ansible.builtin.debug:
+                var: r53_zone_id
+
+        - name: If domain_name is not specified, take the first zone ID and set domain_name
+          when: domain_name is undefined
+          block:
+
+            - name: Debug hosted_zones.HostedZones, default false
+              when: debug | default(false)
+              ansible.builtin.debug:
+                var: hosted_zones.HostedZones | flatten(levels=1)
+
+            - name: Set r53_zone_id fact with hosted_zones first zone ID
+              ansible.builtin.set_fact:
+                r53_zone_id: "{{ hosted_zones.HostedZones[0].Id | replace('/hostedzone/', '') }}"
+
+            - name: Debug r53_zone_id, default false
+              when: debug | default(false)
+              ansible.builtin.debug:
+                var: r53_zone_id
+
+            - name: Set domain_name fact with hosted_zones first domain name
+              ansible.builtin.set_fact:
+                domain_name: "{{ hosted_zones.HostedZones[0].Name | regex_replace('\\.$', '') }}"
+
+        - name: Debug zone ID and domain_name, default false
+          when: debug | default(false)
+          ansible.builtin.debug:
+            msg: "Using zone named {{ domain_name }} with zone ID {{ r53_zone_id }}."
+
+    - name: Create an S3 bucket for out main.tf
+      amazon.aws.s3_bucket:
+        region: "{{ aws_region }}"
+        name: "{{ my_s3_bucket_name }}"
+        state: present
+
+    - name: Grab my public ssh key from remote url
+      ansible.builtin.get_url:
+        url: '{{ my_remote_ssh_pub_key }}'
+        dest: "{{ playbook_dir }}/id_rsa.pub"
+        mode: '0644'
+
+    - name: Create key using key_material obtained using 'file' lookup plugin
+      amazon.aws.ec2_key:
+        name: "{{ ssh_key_name }}"
+        region: "{{ aws_region }}"
+        key_material: "{{ lookup('file', '{{ playbook_dir }}/id_rsa.pub') }}"
+
+    - name: Include the files needed to destroy the infrastructure
+      ansible.builtin.include_vars:
+        file: files/tf_files.yml
+
+    - name: Templates we care about
+      loop: "{{ files }}"
+      ansible.builtin.template:
+        src: templates/{{ item['template'] }}
+        dest: "{{ playbook_dir }}/{{ item['name'] }}"
+        force: true
+        mode: '0644'
+
+    - name: PUT Terraform config files into s3
+      loop: "{{ tf_config_files }}"
+      amazon.aws.s3_object:
+        bucket: "{{ my_s3_bucket_name }}"
+        object: development/{{ item }}
+        src: "{{ playbook_dir }}/{{ item }}"
+        mode: put
+
+    - name: Deploy hosts to AWS
+      register: tf_hosts_result
+      community.general.terraform:
+        project_path: "{{ playbook_dir }}"
+        force_init: true
+        state: present
+
+    - name: Debug terraform apply
+      when: debug | default(false)
+      ansible.builtin.debug:
+        var: tf_hosts_result
+
+    - name: Create a zip archive of a directory
+      community.general.archive:
+        path: "{{ playbook_dir }}/.terraform" # The directory you want to zip
+        dest: "{{ playbook_dir }}/terraform.zip" # The destination path and filename for the zip file
+        format: zip
+
+    - name: PUT my archived /.terraform/providers/ into s3
+      amazon.aws.s3_object:
+        bucket: "{{ my_s3_bucket_name }}"
+        object: development/terraform.zip
+        src: "{{ playbook_dir }}/terraform.zip"
+        mode: put
+
+    - name: Debug host names
+      when: debug | default(false)
+      ansible.builtin.debug:
+        var: tf_hosts_result.outputs.instance_dns_names.value
+
+    - name: Debug ip addresses
+      when: debug | default(false)
+      ansible.builtin.debug:
+        var: tf_hosts_result.outputs.instance_public_ips.value
+
+    - name: Set fact terraform_host
+      ansible.builtin.set_fact:
+        terraform_host: "{{ tf_hosts_result.outputs.instance_dns_names.value | select('match', 'terraform.*') | list | first }}"
+
+    - name: Set fact vault_host
+      ansible.builtin.set_fact:
+        vault_host: "{{ tf_hosts_result.outputs.instance_dns_names.value | select('match', 'vault.*') | list | first }}"
+
+    - name: Debug hosts list
+      when: debug | default(false)
+      ansible.builtin.debug:
+        msg:
+          - 'terraform_host: {{ terraform_host }}'
+          - 'vault_host: {{ vault_host }}'
+
+    - name: Template inventory.j2 to playbook_dir/inventory
+      ansible.builtin.template:
+        src: templates/inventory.j2
+        dest: '{{ playbook_dir }}/inventory'
+        force: true
+        mode: '0644'
+
+    - name: Force inventory refresh
+      ansible.builtin.meta: refresh_inventory
+
+- name: Destroy our infrastructure
+  tags:
+    - remove
+  block:
+
+    - name: Lookup the necessary AWS R53 hosted zone ID
+      block:
+
+        - name: List all hosted zones
+          register: hosted_zones
+          amazon.aws.route53_info:
+            query: hosted_zone
+            hosted_zone_method: list_by_name
+
+        - name: Debug hosted_zones, default false
+          when: debug | default(false)
+          ansible.builtin.debug:
+            var: hosted_zones
+
+        - name: If domain_name is specified, look for that zone ID
+          when: domain_name is defined
+          block:
+
+            - name: Set r53_zone_id fact with hosted_zones zone ID based on name
+              when: item.Name == ( domain_name ~ '.' )
+              loop: "{{ hosted_zones.HostedZones | flatten(levels=1) }}"
+              ansible.builtin.set_fact:
+                r53_zone_id: "{{ item.Id | replace('/hostedzone/', '') }}"
+
+            - name: Debug r53_zone_id, default false
+              when: debug | default(false)
+              ansible.builtin.debug:
+                var: r53_zone_id
+
+        - name: If domain_name is not specified, take the first zone ID and set domain_name
+          when: domain_name is undefined
+          block:
+
+            - name: Debug hosted_zones.HostedZones, default false
+              when: debug | default(false)
+              ansible.builtin.debug:
+                var: hosted_zones.HostedZones | flatten(levels=1)
+
+            - name: Set r53_zone_id fact with hosted_zones first zone ID
+              ansible.builtin.set_fact:
+                r53_zone_id: "{{ hosted_zones.HostedZones[0].Id | replace('/hostedzone/', '') }}"
+
+            - name: Debug r53_zone_id, default false
+              when: debug | default(false)
+              ansible.builtin.debug:
+                var: r53_zone_id
+
+            - name: Set domain_name fact with hosted_zones first domain name
+              ansible.builtin.set_fact:
+                domain_name: "{{ hosted_zones.HostedZones[0].Name | regex_replace('\\.$', '') }}"
+
+        - name: Debug zone ID and domain_name, default false
+          when: debug | default(false)
+          ansible.builtin.debug:
+            msg: "Using zone named {{ domain_name }} with zone ID {{ r53_zone_id }}."
+
+    - name: Include the files needed to destroy the infrastructure
+      ansible.builtin.include_vars:
+        file: files/s3_files.yml
+
+    - name: Get my files from my s3 bucket
+      loop: "{{ s3_files }}"
+      amazon.aws.s3_object:
+        bucket: "{{ my_s3_bucket_name }}"
+        object: "{{ item['object'] }}"
+        dest: "{{ playbook_dir }}/{{ item['name'] }}"
+        mode: get
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/.terraform"
+        state: directory
+        mode: '0700'
+
+    - name: Extract providers
+      ansible.builtin.unarchive:
+        src: "{{ playbook_dir }}/terraform.zip"
+        dest: "{{ playbook_dir }}/"
+
+    - name: Destroy hosts in AWS
+      register: tf_hosts_result
+      community.general.terraform:
+        project_path: "{{ playbook_dir }}"
+        force_init: true
+        state: absent
+        init_reconfigure: true
+
+    - name: Debug terraform apply
+      when: debug | default(false)
+      ansible.builtin.debug:
+        var: tf_hosts_result
+
+    - name: Remove my S3 bucket for out main.tf
+      amazon.aws.s3_bucket:
+        region: "{{ aws_region }}"
+        name: "{{ my_s3_bucket_name }}"
+        force: true
+        state: absent
+
+    - name: Force inventory refresh
+      ansible.builtin.meta: refresh_inventory

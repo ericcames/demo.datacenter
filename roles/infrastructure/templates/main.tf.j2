@@ -1,0 +1,162 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0" # Or your preferred version
+    }
+  }
+}
+
+provider "aws" {
+  region = "{{ aws_region }}"
+}
+
+locals {
+  instance_names = ["vault", "terraform"]
+}
+
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "main-vpc"
+  }
+}
+
+resource "aws_subnet" "public_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "{{ aws_region }}b" # region
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "public-subnet-b"
+  }
+}
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "internet-gateway"
+  }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.gw.id
+  }
+  tags = {
+    Name = "public-routes"
+  }
+}
+
+resource "aws_route_table_association" "public_b" {
+  subnet_id      = aws_subnet.public_b.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_security_group" "web_sg" {
+  name_prefix = "web-sg-"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "SSH access"
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTP access"
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS access"
+  }
+
+  # ingress {
+  #   from_port   = 587
+  #   to_port     = 587
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  #   description = "SMTP submission port"
+  # }
+
+  ingress {
+    from_port   = 8200
+    to_port     = 8200
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Hashicorp Vault UI port"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "web-security-group"
+  }
+}
+
+resource "aws_instance" "web" {
+  count                  = 2
+  ami                    = "{{ aws_ami }}"
+  instance_type          = "{{ aws_type }}"
+  subnet_id              = aws_subnet.public_b.id
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  key_name               = "{{ ssh_key_name }}"
+  root_block_device {
+    volume_size = 100
+    volume_type = "gp2"
+  }
+  tags = {
+    Name = "${local.instance_names[count.index]}.{{ domain_name }}"
+    Type = local.instance_names[count.index]
+    Domain = "{{ domain_name }}"
+  }
+}
+
+resource "aws_eip" "eip" {
+  count    = 2
+  domain   = "vpc"
+  instance = aws_instance.web[count.index].id
+  tags = {
+    Name = "${local.instance_names[count.index]}-eip"
+  }
+}
+
+resource "aws_route53_record" "www" {
+  count   = 2
+  zone_id = "{{ r53_zone_id }}"
+  name     = "${local.instance_names[count.index]}"
+  type    = "A"
+  ttl     = 300
+  records = [aws_eip.eip[count.index].public_ip]
+}
+
+# resource "aws_ses_email_identity" "{{ email_address | replace('@','_at_') | replace('.','_dot_') }}" {
+#   email = "{{ email_address }}"
+# }
+
+output "instance_public_ips" {
+  value = aws_eip.eip.*.public_ip
+  description = "Public IP addresses of the EC2 instances"
+}
+
+output "instance_dns_names" {
+  value = aws_route53_record.www.*.fqdn
+  description = "DNS names of the EC2 instances"
+}

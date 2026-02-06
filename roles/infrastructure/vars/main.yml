@@ -1,0 +1,110 @@
+# Domain name for environment - define this if you don't want the deployer to use the first domain it finds in AWS Route53
+# domain_name: CHANGEME.DOMAIN.NAME
+ssh_key_name: my_public_ssh_key
+email_address: eames@redhat.com # the email address used to send emails from the demo
+# redhat_subscription_username: user@example.com
+# redhat_subscription_password: CHANGEME
+
+# AWS information
+# this section is only used by deploy-hosts.yml for AWS deployment. Other deployments don't need it.
+aws_profile: default                        # aws profile name from ~/.aws/credentials
+aws_ami: ami-0a5229853eaaa29c1              # Red Hat Enterprise Linux version 10 (HVM), EBS General Purpose (SSD) Volume Type
+aws_type: m7i.xlarge                        # 4 vCPUs, 16 GiB RAM 4g EPYC
+aws_domain: "{{ domain_name }}"
+aws_region: us-west-1
+my_s3_bucket_name: hashicorp-daily-demo-451
+tf_config_files:
+  - main.tf
+  - backend.tf
+ansible_python_interpreter: /usr/bin/python3
+# ec2_priv_keyfile_name: "{{ ssh_key_name }}"
+# ec2_priv_keyfile: "{{ playbook_dir }}/{{ ec2_priv_keyfile_name }}"
+
+# Override these role variables to attach a RHEL subscription to the Vault RHEL server
+# vault_provision_redhat_subscription: true
+# vault_provision_redhat_username: "{{ redhat_subscription_username }}"
+# vault_provision_redhat_password: "{{ redhat_subscription_password }}"
+
+# Override this role variable to point to your local Vault license file
+# vault_install_vault_license_file: /tmp/vault.hclic
+
+# Override these role variables to point to user-provided cert/key files
+# vault_install_tls_cert: /path/to/cert.pem
+# vault_install_tls_key: /path/to/key.pem
+
+# Override these role variables to specify a different number of unseal keys or a different success threshold
+# vault_key_count: 5
+# vault_key_threshold: 3
+
+# Override these variables to store the vault root token and unseal keys in a different location
+# vault_root_token_dir: /root/.vault
+# vault_unseal_key_dir: /root/.vault
+
+# Installation directories for Vault TF config
+vault_terraform_dir: "{{ ansible_user_dir }}/terraform"
+vault_terraform_certdir: "{{ ansible_user_dir }}/terraform/certs"
+
+# API port for Vault
+vault_install_api_port: 8200
+
+# Override these role variables to install user-provided CA certs to the system trust store
+# aap_install_provide_certs: false
+# aap_install_custom_ca_cert: "custom-ca.crt"
+
+# Override these role variables to attach a RHEL subscription to the AAP RHEL server
+# aap_provision_redhat_subscription: false
+# aap_provision_redhat_subscription_manifest: false
+# aap_provision_redhat_username: "{{ redhat_subscription_username }}"
+# aap_provision_redhat_password: "{{ redhat_subscription_password }}"
+# aap_provision_redhat_pool: CHANGEME
+
+# this is the manifest from your AAP subscription
+# aap_provision_manifest: CHANGEME
+
+# Change this to change the default password for AAP
+# aap_install_common_password: CHANGEME
+
+# Change these to reset aap installation details
+# aap_dir: /home/aap
+# aap_installer: ansible-automation-platform-containerized-setup-bundle-2.5-11.1-x86_64.tar.gz
+# aap_user: aap
+# aap_validate_certs: true
+# aap_hashi_demo_ee: quay.io/ajacocks/hashi-demo-ee
+
+# Override these role variables to attach a RHEL subscription to the GitLab RHEL server
+# gitlab_provision_redhat_subscription: false
+# gitlab_provision_redhat_username: "{{ redhat_subscription_username }}"
+# gitlab_provision_redhat_password: "{{ redhat_subscription_password }}"
+
+# Set the GitLab admin password here
+# gitlab_install_password: CHANGEME
+
+# Override these role variables to install user-provided CA certs to the system trust store
+# gitlab_install_provide_certs: false
+
+# Change these to rename the terraform user or relocate its home directory
+terraform_group: tfe
+terraform_user: tfe
+terraform_home_dir: /home/tfe
+
+# Override these role variables to attach a RHEL subscription to the Terraform RHEL server
+# terraform_provision_redhat_subscription: false
+# terraform_provision_redhat_username: "{{ redhat_subscription_username }}"
+# terraform_provision_redhat_password: "{{ redhat_subscription_password }}"
+
+# Override this role variable to point to your local Terraform license file
+terraform_install_license_file: /tmp/terraform.hclic
+
+# Override these role variables to install user-provided CA certs to the system trust store
+terraform_install_provide_certs: true
+
+# Set the Terraform admin user password here (minimum 10 characters)
+terraform_install_common_password: CHANGEMENOW
+
+# Set the Terraform admin user credentials here
+terraform_install_admin_email: CHANGEME@CHANGEME.COM
+terraform_install_admin_orgname: CHANGEME
+terraform_install_admin_workspace: CHANGEME
+
+# where certificates are stored on the executing host
+local_certdir: "{{ playbook_dir }}/data"
