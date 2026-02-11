@@ -37,7 +37,7 @@ variable "f5_ami_name" {
 variable "infoblox_ami_name" {
   description = "Search string for InfoBlox AMI"
   type        = string
-  default     = "*LTSPayGo*"
+  default     = "9.*.*-LTS-*"
 }
 
 variable "panos_ami_name" {
