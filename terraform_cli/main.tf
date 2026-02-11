@@ -270,4 +270,10 @@ resource "aws_instance" "infoblox" {
   tags = {
     Name = "Infoblox"
   }
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
 }
