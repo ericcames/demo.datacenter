@@ -147,6 +147,7 @@ resource "aws_instance" "app_server" {
 
   tags = {
     Name = "Ubuntu"
+    Application = "Ubuntu"
   }
 }
 
@@ -159,6 +160,7 @@ resource "aws_instance" "f5" {
 
   tags = {
     Name = "F5"
+    Application = "f5demo"
   }
 }
 
@@ -171,6 +173,7 @@ resource "aws_instance" "RHEL9_web_A" {
 
   tags = {
     Name = "RHEL9_web_A"
+    Application = "webservers"
   }
 }
 
@@ -183,6 +186,7 @@ resource "aws_instance" "RHEL9_web_C" {
 
   tags = {
     Name = "RHEL9_web_C"
+    Application = "webservers"
   }
 }
 
@@ -196,6 +200,7 @@ resource "aws_instance" "win25" {
 
   tags = {
     Name = "Active Directory"
+    Application = "ad"
   }
 }
 
@@ -209,6 +214,7 @@ resource "aws_instance" "satellite" {
 
   tags = {
     Name = "Satellite"
+    Application = "satellite"
   }
 }
 
@@ -221,6 +227,7 @@ resource "aws_instance" "panos" {
 
   tags = {
     Name = "Panos"
+    Application = "panos"
   }
 }
 
@@ -233,6 +240,7 @@ resource "aws_instance" "idm" {
 
   tags = {
     Name = "Identity Management"
+    Application = "idm"
   }
 }
 
@@ -245,6 +253,7 @@ resource "aws_instance" "vault" {
 
   tags = {
     Name = "Vault"
+    Application = "vault"
   }
 }
 
@@ -257,6 +266,7 @@ resource "aws_instance" "hashicorp" {
 
   tags = {
     Name = "HashiCorp"
+    Application = "hashicorp"
   }
 }
 
@@ -269,6 +279,7 @@ resource "aws_instance" "infoblox" {
 
   tags = {
     Name = "Infoblox"
+    Application = "infoblox"
   }
 
   metadata_options {
