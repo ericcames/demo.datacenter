@@ -223,3 +223,51 @@ resource "aws_instance" "panos" {
     Name = "Panos"
   }
 }
+
+resource "aws_instance" "idm" {
+  ami                    = data.aws_ami.rhel9.id
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.public_c.id
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  key_name               = "my_public_ssh_key"
+
+  tags = {
+    Name = "Identity Management"
+  }
+}
+
+resource "aws_instance" "vault" {
+  ami                    = data.aws_ami.rhel9.id
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.public_c.id
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  key_name               = "my_public_ssh_key"
+
+  tags = {
+    Name = "Vault"
+  }
+}
+
+resource "aws_instance" "hashicorp" {
+  ami                    = data.aws_ami.rhel9.id
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.public_c.id
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  key_name               = "my_public_ssh_key"
+
+  tags = {
+    Name = "HashiCorp"
+  }
+}
+
+resource "aws_instance" "infoblox" {
+  ami                    = data.aws_ami.infoblox.id
+  instance_type          = "m5.xlarge"
+  subnet_id              = aws_subnet.public_a.id
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  key_name               = "my_public_ssh_key"
+
+  tags = {
+    Name = "Infoblox"
+  }
+}
