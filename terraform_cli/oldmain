@@ -138,9 +138,42 @@ module "key_pair" {
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDbl1nB/o3sUVBtk32IAoYanB5EyhPTK2Vpt7FzK4o7R5NMLkU7vzIgg4i6V6CtgQDdNlSdlsP7jmTvrwjjEQGnT9iVTOi78j6obURHD4VRqDnvUecq1GucSUGu2Tbht6CHu1622rznYgL2vTr5W+NqHozbgl4WfhWlr98FmKLCSRjqQjd5d8RP41+KoQ3VHIpdKqaFwtPCxXaQNLFV356z9fb4D1Peywt8P60NyWfPYwSmKxJ3jTpMhssyH+v6/Z2bjt+z8lbnHdaACxmkPHknr4CldTgMH+wjLliJ8PsXiWLv7Ts4wEzzP49TAlTAom/QqCVprpsro1fdfNhJDQQnCJWT48uXYHDewlOPdn7oyz3ZAOGS+/Mgs0jRD5Qx8ajP24eEbYdkdZu7YmraBbZ3LNjZZFkjOgSviH/oRQUZtRHUqB5+brMjUFm6qpVO3ps/J3pSdDyWX840xOqyCqUw3DwF9/b5z/966rnDStEw+gLudy+T/K2kN5qHGC4HBnE= awx@aap.internal.ames.net"
 }
 
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
+data "aws_ami" "win25" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2025-English-Full-Base-*"]
+  }
+
+  owners = ["801119661308"] # Canonical
+}
+
+data "aws_ami" "rhel9_2" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["RHEL-9.2.0_HVM-20230503-x86_64-41-Access2-GP2"]
+  }
+
+  owners = ["309956199498"] # Canonical
+}
+
 resource "aws_instance" "app_server" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
+  instance_type          = var.instance_type
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
   key_name               = "my_public_ssh_key"
@@ -151,7 +184,7 @@ resource "aws_instance" "app_server" {
 }
 
 resource "aws_instance" "f5" {
-  ami                    = data.aws_ami.f5_21.id
+  ami                    = var.f5_ami
   instance_type          = "m5.xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
@@ -163,7 +196,7 @@ resource "aws_instance" "f5" {
 }
 
 resource "aws_instance" "RHEL9_web_A" {
-  ami                    = data.aws_ami.rhel9.id
+  ami                    = "ami-054f77471c0e69deb"
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
@@ -175,7 +208,7 @@ resource "aws_instance" "RHEL9_web_A" {
 }
 
 resource "aws_instance" "RHEL9_web_C" {
-  ami                    = data.aws_ami.rhel9.id
+  ami                    = "ami-054f77471c0e69deb"
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
@@ -187,7 +220,7 @@ resource "aws_instance" "RHEL9_web_C" {
 }
 
 resource "aws_instance" "win25" {
-  ami                    = data.aws_ami.win25.id
+  ami                    = "ami-072fcf26b3b4a134a"
   instance_type          = "m5.xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
@@ -195,13 +228,13 @@ resource "aws_instance" "win25" {
   user_data              = file("scripts/win25_userdata")
 
   tags = {
-    Name = "Active Directory"
+    Name = "Windows 2025"
   }
 }
 
 resource "aws_instance" "satellite" {
   # RHEL 10
-  ami                    = data.aws_ami.rhel10.id
+  ami                    = "ami-0a5229853eaaa29c1"
   instance_type          = "m5.2xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
@@ -213,7 +246,7 @@ resource "aws_instance" "satellite" {
 }
 
 resource "aws_instance" "panos" {
-  ami                    = data.aws_ami.panos.id
+  ami                    = "ami-01a1990aeedda5b5e"
   instance_type          = "c5n.xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
