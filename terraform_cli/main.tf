@@ -146,7 +146,7 @@ resource "aws_instance" "app_server" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "Ubuntu"
+    Name        = "Ubuntu"
     Application = "Ubuntu"
   }
 }
@@ -159,7 +159,7 @@ resource "aws_instance" "f5" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "F5"
+    Name        = "F5"
     Application = "f5demo"
   }
 }
@@ -172,7 +172,7 @@ resource "aws_instance" "RHEL9_web_A" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "RHEL9_web_A"
+    Name        = "RHEL9_web_A"
     Application = "webservers"
   }
 }
@@ -185,7 +185,7 @@ resource "aws_instance" "RHEL9_web_C" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "RHEL9_web_C"
+    Name        = "RHEL9_web_C"
     Application = "webservers"
   }
 }
@@ -199,7 +199,7 @@ resource "aws_instance" "win25" {
   user_data              = file("scripts/win25_userdata")
 
   tags = {
-    Name = "Active Directory"
+    Name        = "Active Directory"
     Application = "ad"
   }
 }
@@ -213,7 +213,7 @@ resource "aws_instance" "satellite" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "Satellite"
+    Name        = "Satellite"
     Application = "satellite"
   }
 }
@@ -226,7 +226,7 @@ resource "aws_instance" "panos" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "Panos"
+    Name        = "Panos"
     Application = "panos"
   }
 }
@@ -239,7 +239,7 @@ resource "aws_instance" "idm" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "Identity Management"
+    Name        = "Identity Management"
     Application = "idm"
   }
 }
@@ -252,7 +252,7 @@ resource "aws_instance" "vault" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "Vault"
+    Name        = "Vault"
     Application = "vault"
   }
 }
@@ -265,7 +265,7 @@ resource "aws_instance" "hashicorp" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "HashiCorp"
+    Name        = "HashiCorp"
     Application = "hashicorp"
   }
 }
@@ -278,7 +278,7 @@ resource "aws_instance" "infoblox" {
   key_name               = "my_public_ssh_key"
 
   tags = {
-    Name = "Infoblox"
+    Name        = "Infoblox"
     Application = "infoblox"
   }
 
