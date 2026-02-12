@@ -2,17 +2,8 @@
 - name: Provision demo datacenter
   hosts: localhost
   connection: local
-  vars:
-    machine:
-      password: '{{ ansible_password }}'
 
   tasks:
-
-    - name: Debug
-      tags:
-        - create
-      ansible.builtin.debug:
-        var: password
 
     - name: Include the infrastructure role
       tags:

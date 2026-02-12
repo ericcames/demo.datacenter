@@ -102,7 +102,7 @@
         mode: put
 
     - name: Refresh my inventory
-      infra.aap_configuration.controller_inventory_source_update:
+      ansible.controller.inventory_source_update:
         name: running
         inventory: "Demo Datacenter"
         organization: "IT Service Automation"
@@ -181,7 +181,7 @@
         state: absent
 
     - name: Refresh my inventory
-      infra.aap_configuration.controller_inventory_source_update:
+      ansible.controller.inventory_source_update:
         name: running
         inventory: "Demo Datacenter"
         organization: "IT Service Automation"
