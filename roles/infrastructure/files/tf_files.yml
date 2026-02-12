@@ -6,3 +6,5 @@ files:
     template: backend.tf.j2
   - name: data.tf
     template: data.tf.j2
+  - name: win25_userdata_nopasswd
+    template: win25_userdata_nopasswd.j2
