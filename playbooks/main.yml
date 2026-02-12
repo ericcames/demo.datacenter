@@ -2,9 +2,6 @@
 - name: Provision demo datacenter
   hosts: localhost
   connection: local
-  vars:
-    machine:
-      password: '{{ ansible_password }}'
 
   tasks:
 
