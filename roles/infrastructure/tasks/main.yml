@@ -14,6 +14,27 @@
       ansible.builtin.fail:
         msg: Terraform isn't installed. Please install Terraform before proceeding.
 
+    # fail with good error for Automation controller user
+    - name: Determine that both AAP and Machine credentials are set
+      ansible.builtin.assert:
+        that:
+          - "lookup('ansible.builtin.env', 'CONTROLLER_USERNAME') !=''"
+          - "lookup('ansible.builtin.env', 'CONTROLLER_HOST') !=''"
+          - "lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') !=''"
+        fail_msg:
+          - "Red Hat Ansible Automation Platform credential is not set"
+          - "Please assign correct credentials to the Job Template"
+
+    - name: Create a new token
+      ansible.platform.token:
+        aap_hostname: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}"
+        aap_username: "{{ lookup('ansible.builtin.env', 'CONTROLLER_USERNAME') }}"
+        aap_password: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+        aap_validate_certs: false
+        description: Demo Datacenter infrastructure
+        scope: write
+        state: present
+
 - name: Provision our infrastructure
   tags:
     - create
@@ -80,6 +101,37 @@
         src: "{{ playbook_dir }}/terraform.zip"
         mode: put
 
+    - name: Refresh my inventory
+      infra.aap_configuration.controller_inventory_source_update:
+        name: running
+        inventory: "Demo Datacenter"
+        organization: "IT Service Automation"
+        wait: true
+
+    - name: Update existing group
+      ansible.controller.group:
+        controller_host: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}"
+        controller_oauthtoken: "{{ ansible_facts['aap_token']['token'] }}"
+        validate_certs: false
+        name: ad
+        inventory: "Demo Datacenter"
+        preserve_existing_hosts: true
+        variables:
+          ansible_connection: winrm
+          ansible_winrm_transport: credssp
+          ansible_winrm_server_cert_validation: ignore
+          ansible_port: 5986
+          ansible_winrm_operation_timeout_sec: 180
+          ansible_winrm_read_timeout_sec: 240
+
+    - name: Remove my token
+      ansible.platform.token:
+        aap_hostname: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}"
+        existing_token: "{{ ansible_facts['aap_token'] }}"
+        aap_token: "{{ ansible_facts['aap_token']['token'] }}"
+        aap_validate_certs: false
+        state: absent
+
 - name: Destroy our infrastructure
   tags:
     - remove
@@ -128,5 +180,17 @@
         force: true
         state: absent
 
-    - name: Force inventory refresh
-      ansible.builtin.meta: refresh_inventory
+    - name: Refresh my inventory
+      infra.aap_configuration.controller_inventory_source_update:
+        name: running
+        inventory: "Demo Datacenter"
+        organization: "IT Service Automation"
+        wait: true
+
+    - name: Remove my token
+      ansible.platform.token:
+        aap_hostname: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}"
+        existing_token: "{{ ansible_facts['aap_token'] }}"
+        aap_token: "{{ ansible_facts['aap_token']['token'] }}"
+        aap_validate_certs: false
+        state: absent
