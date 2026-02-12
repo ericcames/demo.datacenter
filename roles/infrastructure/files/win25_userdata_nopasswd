@@ -8,6 +8,7 @@ Get-ScheduledTask *ngen* | Disable-ScheduledTask
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v AUOptions /t REG_DWORD /d 1 /f
 net stop wuauserv
 net start wuauserv
+net accounts /minpwlen:7
 
 # Disable Windows Defender Monitoring
 Set-MpPreference -DisableRealtimeMonitoring $true
