@@ -40,6 +40,12 @@
     - create
   block:
 
+    - name: Grab vault from remote url
+      ansible.builtin.get_url:
+        url: '{{ my_remote_vault }}'
+        dest: "{{ playbook_dir }}/remotevault.yml"
+        mode: '0644'
+
     - name: Create an S3 bucket for out main.tf
       amazon.aws.s3_bucket:
         region: "{{ aws_region }}"
