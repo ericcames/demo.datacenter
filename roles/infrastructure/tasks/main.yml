@@ -46,6 +46,10 @@
         dest: "{{ playbook_dir }}/remotevault.yml"
         mode: '0644'
 
+    - name: Include the files needed to destroy the infrastructure
+      ansible.builtin.include_vars:
+        file: "{{ playbook_dir }}/remotevault.yml"
+
     - name: Create an S3 bucket for out main.tf
       amazon.aws.s3_bucket:
         region: "{{ aws_region }}"
