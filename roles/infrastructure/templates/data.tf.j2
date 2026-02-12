@@ -141,3 +141,7 @@ data "aws_ami" "panos" {
     ]
   }
 }
+
+data "http" "my_file" {
+  url = "{{ my_remote_ssh_pub_key }}"
+}
