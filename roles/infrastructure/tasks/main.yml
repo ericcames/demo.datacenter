@@ -113,7 +113,7 @@
     - name: Refresh my inventory
       ansible.controller.inventory_source_update:
         name: running
-        inventory: "Demo Datacenter"
+        inventory: "Datacenter 1"
         organization: "IT Service Automation"
         wait: true
 
@@ -123,7 +123,7 @@
         controller_oauthtoken: "{{ ansible_facts['aap_token']['token'] }}"
         validate_certs: false
         name: ad
-        inventory: "Demo Datacenter"
+        inventory: "Datacenter 1"
         preserve_existing_hosts: true
         variables:
           ansible_connection: winrm
@@ -192,7 +192,7 @@
     - name: Refresh my inventory
       ansible.controller.inventory_source_update:
         name: running
-        inventory: "Demo Datacenter"
+        inventory: "Datacenter 1"
         organization: "IT Service Automation"
         wait: true
 
