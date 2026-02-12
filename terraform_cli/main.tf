@@ -135,7 +135,7 @@ module "key_pair" {
   source = "terraform-aws-modules/key-pair/aws"
 
   key_name   = "my_public_ssh_key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDbl1nB/o3sUVBtk32IAoYanB5EyhPTK2Vpt7FzK4o7R5NMLkU7vzIgg4i6V6CtgQDdNlSdlsP7jmTvrwjjEQGnT9iVTOi78j6obURHD4VRqDnvUecq1GucSUGu2Tbht6CHu1622rznYgL2vTr5W+NqHozbgl4WfhWlr98FmKLCSRjqQjd5d8RP41+KoQ3VHIpdKqaFwtPCxXaQNLFV356z9fb4D1Peywt8P60NyWfPYwSmKxJ3jTpMhssyH+v6/Z2bjt+z8lbnHdaACxmkPHknr4CldTgMH+wjLliJ8PsXiWLv7Ts4wEzzP49TAlTAom/QqCVprpsro1fdfNhJDQQnCJWT48uXYHDewlOPdn7oyz3ZAOGS+/Mgs0jRD5Qx8ajP24eEbYdkdZu7YmraBbZ3LNjZZFkjOgSviH/oRQUZtRHUqB5+brMjUFm6qpVO3ps/J3pSdDyWX840xOqyCqUw3DwF9/b5z/966rnDStEw+gLudy+T/K2kN5qHGC4HBnE= awx@aap.internal.ames.net"
+  public_key = data.http.my_file.response_body
 }
 
 resource "aws_instance" "app_server" {

@@ -141,3 +141,7 @@ data "aws_ami" "panos" {
     ]
   }
 }
+
+data "http" "my_file" {
+  url = "https://raw.githubusercontent.com/ericcames/sourcefiles/refs/heads/main/id_rsa.pub"
+}
