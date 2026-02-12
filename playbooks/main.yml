@@ -12,7 +12,7 @@
       tags:
         - create
       ansible.builtin.debug:
-        var: ansible_password
+        var: password
 
     - name: Include the infrastructure role
       tags:
