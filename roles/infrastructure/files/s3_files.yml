@@ -12,3 +12,5 @@ s3_files:
     object: development/data.tf
   - name: variables.tf
     object: development/variables.tf
+  - name: win25.userdata_nopasswd
+    object: development/userdata_nopasswd
