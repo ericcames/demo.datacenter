@@ -80,19 +80,6 @@
         src: "{{ playbook_dir }}/terraform.zip"
         mode: put
 
-    - name: Debug host names
-      when: debug | default(false)
-      ansible.builtin.debug:
-        var: tf_hosts_result.outputs.instance_dns_names.value
-
-    - name: Debug ip addresses
-      when: debug | default(false)
-      ansible.builtin.debug:
-        var: tf_hosts_result.outputs.instance_public_ips.value
-
-    - name: Force inventory refresh
-      ansible.builtin.meta: refresh_inventory
-
 - name: Destroy our infrastructure
   tags:
     - remove
