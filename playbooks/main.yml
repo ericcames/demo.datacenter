@@ -5,9 +5,14 @@
 
   tasks:
 
-    - name: Debug
-      ansible.builtin.debug:
-        var: ansible_password
+    - name: Grab vault from remote url
+      tags:
+        - create
+      ansible.builtin.get_url:
+        url: '{{ my_remote_vault }}'
+        dest: remotevault.yml
+        mode: '0644'
+
 
     - name: Include the infrastructure role
       tags:
