@@ -2,17 +2,17 @@
 - name: Provision demo datacenter
   hosts: localhost
   connection: local
+  vars:
+    machine:
+      password: '{{ ansible_password }}'
 
   tasks:
 
-    - name: Grab vault from remote url
+    - name: Debug
       tags:
         - create
-      ansible.builtin.get_url:
-        url: '{{ my_remote_vault }}'
-        dest: remotevault.yml
-        mode: '0644'
-
+      ansible.builtin.debug:
+        var: ansible_password
 
     - name: Include the infrastructure role
       tags:
