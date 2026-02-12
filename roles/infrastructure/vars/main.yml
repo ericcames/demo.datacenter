@@ -9,4 +9,5 @@ tf_config_files:
   - data.tf
   - terraform.tf
   - variables.tf
+  - win25_userdata_nopasswd
 ansible_python_interpreter: /usr/bin/python3
