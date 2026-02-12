@@ -8,3 +8,7 @@ s3_files:
     object: development/main.tf
   - name: backend.tf
     object: development/backend.tf
+  - name: data.tf
+    object: development/data.tf
+  - name: variables.tf
+    object: development/variables.tf
