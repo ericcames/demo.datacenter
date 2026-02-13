@@ -1,4 +1,5 @@
-Terraform CLI
+Terraform cli setup
+==================
 
 Install the terraform cli<br>
 Install the aws cli<br>
