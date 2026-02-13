@@ -25,3 +25,7 @@ Useful commands in trying to find amis
 aws ec2 describe-images --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' --filters 'Name=name,Values=F5*BIGIP-*' --output table --region us-west-1
 aws ec2 describe-images --image-ids ami-06253282a0376a081 --region us-west-1
 ```
+Clone this repo to your computer
+```
+git clone git@github.com:ericcames/demo.datacenter.git
+```
