@@ -1,8 +1,8 @@
 Terraform CLI
 
-Install the terraform cli
-Install the aws cli
-Get access to your AWS environment
+Install the terraform cli<br>
+Install the aws cli<br>
+Get access to your AWS environment<br>
 Setup your environment variables for access to your aws environment
 ```
 AWS_ACCESS_KEY_ID=AKIAV2KYZ_GOES_HERE
