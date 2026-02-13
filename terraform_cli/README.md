@@ -8,7 +8,7 @@ Setup your environment variables for access to your aws environment
 ```
 AWS_ACCESS_KEY_ID=AKIAV2KYZ_GOES_HERE
 AWS_SECRET_ACCESS_KEY=LJv+2wycnvUPI2n_GOES_HERE
-export PS1 EDITOR AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
 . ./.bashrc
 ```
 Commands to develop your files
