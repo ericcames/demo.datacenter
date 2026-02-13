@@ -21,3 +21,7 @@ Activate the subscriptions needed for Infoblox, F5, Palo Alto, appliances. Makes
 ec2 instances
 =========
 ![alt text](https://github.com/ericcames/demo.datacenter/blob/main/docs/images/dc1_aws_instances.png "Images")
+
+Setup - Datacenter 1
+=========
+![alt text](https://github.com/ericcames/demo.datacenter/blob/main/docs/images/dc1_job_output.png "Images")
