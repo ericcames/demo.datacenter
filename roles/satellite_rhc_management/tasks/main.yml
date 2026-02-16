@@ -1,0 +1,34 @@
+---
+# tasks file for satellite_rhc_management
+
+# ==============================================================================
+# VALIDATION (always runs regardless of tags)
+# ==============================================================================
+- name: Validate RHEL version
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == "RedHat"
+      - ansible_distribution_major_version | int >= 8
+      - ansible_distribution_major_version | int <= 10
+    fail_msg: "This role requires RHEL 8, 9, or 10"
+    success_msg: "Running on {{ ansible_distribution }} {{ ansible_distribution_version }}"
+  tags: [always]
+
+- name: Display operation being performed
+  ansible.builtin.debug:
+    msg: "Tags: {{ ansible_run_tags | default(['all']) | join(', ') }}"
+  tags: [always]
+
+# ==============================================================================
+# REGISTRATION TASKS (create tag)
+# ==============================================================================
+- name: Include registration tasks
+  ansible.builtin.include_tasks: register.yml
+  tags: [create, never]
+
+# ==============================================================================
+# UNREGISTRATION TASKS (remove tag)
+# ==============================================================================
+- name: Include unregistration tasks
+  ansible.builtin.include_tasks: unregister.yml
+  tags: [remove, never]

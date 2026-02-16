@@ -1,0 +1,75 @@
+---
+# Unregistration tasks (remove tag)
+
+- name: Check current registration status
+  ansible.builtin.command: subscription-manager identity
+  register: current_registration
+  changed_when: false
+  failed_when: false
+  tags: [remove]
+
+- name: Display current registration status
+  ansible.builtin.debug:
+    msg: "{{ 'System is currently registered' if current_registration.rc == 0 else 'System is not registered' }}"
+  tags: [remove]
+
+- name: Display unregistration plan
+  ansible.builtin.debug:
+    msg:
+      - "==============================================="
+      - "Unregistration Plan:"
+      - "==============================================="
+      - "  System: {{ ansible_fqdn }}"
+      - "  Current Status: {{ 'Registered' if current_registration.rc == 0 else 'Not Registered' }}"
+      - "  Actions:"
+      - "    - Unregister from Red Hat Subscription Management"
+      - "    - Disconnect from Red Hat Insights"
+      - "    - Clean local subscription data"
+      - "==============================================="
+  when: current_registration.rc == 0
+  tags: [remove]
+
+- name: Unregister system using redhat.rhel_system_roles.rhc
+  ansible.builtin.include_role:
+    name: redhat.rhel_system_roles.rhc
+  vars:
+    rhc_state: absent
+  tags: [remove]
+
+- name: Verify unregistration from subscription-manager
+  ansible.builtin.command: subscription-manager identity
+  register: verify_unreg_sm
+  changed_when: false
+  failed_when: verify_unreg_sm.rc == 0
+  tags: [remove]
+
+- name: Verify unregistration from Insights
+  ansible.builtin.command: insights-client --status
+  register: verify_unreg_insights
+  changed_when: false
+  failed_when: false
+  tags: [remove]
+
+- name: Display unregistration results
+  ansible.builtin.debug:
+    msg:
+      - "==============================================="
+      - "Unregistration Complete!"
+      - "==============================================="
+      - "  Subscription Manager: {{ 'Unregistered' if verify_unreg_sm.rc != 0 else 'Still Registered (unexpected)' }}"
+      - "  Insights: {{ 'Unregistered' if 'not registered' in verify_unreg_insights.stdout | lower else 'Status unknown' }}"
+      - "==============================================="
+  tags: [remove]
+
+- name: Clean up subscription manager cache
+  ansible.builtin.command: subscription-manager clean
+  changed_when: true
+  failed_when: false
+  tags: [remove]
+
+- name: Display cleanup confirmation
+  ansible.builtin.debug:
+    msg:
+      - "Local subscription data cleaned"
+      - "System is ready for re-registration if needed"
+  tags: [remove]

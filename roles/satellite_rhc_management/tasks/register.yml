@@ -1,0 +1,217 @@
+---
+# Registration tasks (create tag)
+
+- name: Validate authentication is provided
+  ansible.builtin.assert:
+    that:
+      - (rhc_auth_activation_key | length > 0 and rhc_organization | length > 0) or
+        (rhc_auth_username | length > 0 and rhc_auth_password | length > 0)
+    fail_msg: |
+      Authentication credentials required for registration. Provide either:
+        - rhc_auth_activation_key AND rhc_organization
+        OR
+        - rhc_auth_username AND rhc_auth_password
+    success_msg: "Authentication credentials validated"
+  tags: [create]
+
+- name: Build rhc_auth variable for activation key
+  ansible.builtin.set_fact:
+    __rhc_auth:
+      activation_keys:
+        keys:
+          - "{{ rhc_auth_activation_key }}"
+  when:
+    - rhc_auth_activation_key | length > 0
+  tags: [create]
+
+- name: Build rhc_auth variable for username/password
+  ansible.builtin.set_fact:
+    __rhc_auth:
+      login:
+        username: "{{ rhc_auth_username }}"
+        password: "{{ rhc_auth_password }}"
+  when:
+    - rhc_auth_activation_key | length == 0
+    - rhc_auth_username | length > 0
+  no_log: true
+  tags: [create]
+
+- name: Build Satellite repositories for RHEL 8
+  ansible.builtin.set_fact:
+    __rhc_repositories:
+      - name: "rhel-8-for-x86_64-baseos-rpms"
+        state: enabled
+      - name: "rhel-8-for-x86_64-appstream-rpms"
+        state: enabled
+      - name: "satellite-{{ rhc_satellite_version }}-for-rhel-8-x86_64-rpms"
+        state: enabled
+      - name: "satellite-maintenance-{{ rhc_satellite_version }}-for-rhel-8-x86_64-rpms"
+        state: enabled
+  when:
+    - rhc_enable_satellite_repos | bool
+    - ansible_distribution_major_version == "8"
+  tags: [create]
+
+- name: Build Satellite repositories for RHEL 9
+  ansible.builtin.set_fact:
+    __rhc_repositories:
+      - name: "rhel-9-for-x86_64-baseos-rpms"
+        state: enabled
+      - name: "rhel-9-for-x86_64-appstream-rpms"
+        state: enabled
+      - name: "satellite-{{ rhc_satellite_version }}-for-rhel-9-x86_64-rpms"
+        state: enabled
+      - name: "satellite-maintenance-{{ rhc_satellite_version }}-for-rhel-9-x86_64-rpms"
+        state: enabled
+  when:
+    - rhc_enable_satellite_repos | bool
+    - ansible_distribution_major_version == "9"
+  tags: [create]
+
+- name: Build Satellite repositories for RHEL 10
+  ansible.builtin.set_fact:
+    __rhc_repositories:
+      - name: "rhel-10-for-x86_64-baseos-rpms"
+        state: enabled
+      - name: "rhel-10-for-x86_64-appstream-rpms"
+        state: enabled
+      - name: "satellite-{{ rhc_satellite_version }}-for-rhel-10-x86_64-rpms"
+        state: enabled
+      - name: "satellite-maintenance-{{ rhc_satellite_version }}-for-rhel-10-x86_64-rpms"
+        state: enabled
+  when:
+    - rhc_enable_satellite_repos | bool
+    - ansible_distribution_major_version == "10"
+  tags: [create]
+
+- name: Use custom repositories if provided
+  ansible.builtin.set_fact:
+    __rhc_repositories: "{{ rhc_custom_repositories }}"
+  when:
+    - not rhc_enable_satellite_repos | bool
+    - rhc_custom_repositories | length > 0
+  tags: [create]
+
+- name: Build rhc_server variable for Satellite URL
+  ansible.builtin.set_fact:
+    __rhc_server:
+      hostname: "{{ rhc_satellite_url }}"
+  when:
+    - rhc_satellite_url | length > 0
+  tags: [create]
+
+- name: Build advanced rhc_server variable
+  ansible.builtin.set_fact:
+    __rhc_server:
+      hostname: "{{ rhc_server_hostname }}"
+      port: "{{ rhc_server_port }}"
+      prefix: "{{ rhc_server_prefix }}"
+      insecure: "{{ rhc_server_insecure }}"
+  when:
+    - rhc_server_hostname | length > 0
+  tags: [create]
+
+- name: Build rhc_proxy variable
+  ansible.builtin.set_fact:
+    __rhc_proxy:
+      hostname: "{{ rhc_proxy_hostname }}"
+      port: "{{ rhc_proxy_port | int }}"
+      scheme: "{{ rhc_proxy_scheme }}"
+      username: "{{ rhc_proxy_username }}"
+      password: "{{ rhc_proxy_password }}"
+  when:
+    - rhc_proxy_hostname | length > 0
+  no_log: true
+  tags: [create]
+
+- name: Build rhc_insights variable
+  ansible.builtin.set_fact:
+    __rhc_insights:
+      state: "{{ rhc_insights_state }}"
+      autoupdate: "{{ rhc_insights_autoupdate }}"
+      remediation: "{{ rhc_insights_remediation }}"
+      display_name: "{{ rhc_insights_display_name }}"
+      tags: "{{ rhc_insights_tags }}"
+  tags: [create]
+
+- name: Build rhc_release variable
+  ansible.builtin.set_fact:
+    __rhc_release: "{{ rhc_release_lock }}"
+  when:
+    - rhc_release_lock | length > 0
+  tags: [create]
+
+- name: Display registration configuration summary
+  ansible.builtin.debug:
+    msg:
+      - "==============================================="
+      - "RHC Registration Configuration:"
+      - "==============================================="
+      - "  Organization: {{ rhc_organization }}"
+      - "  Auth Method: {{ 'Activation Key' if rhc_auth_activation_key | length > 0 else 'Username/Password' }}"
+      - "  Server: {{ rhc_satellite_url if rhc_satellite_url | length > 0 else 'Red Hat CDN' }}"
+      - "  Insights: {{ rhc_insights_state }}"
+      - "  Satellite Repos: {{ 'Yes (v' + rhc_satellite_version + ')' if rhc_enable_satellite_repos else 'No' }}"
+      - "  RHEL Version: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+      - "==============================================="
+  tags: [create]
+
+- name: Register system using redhat.rhel_system_roles.rhc
+  ansible.builtin.include_role:
+    name: redhat.rhel_system_roles.rhc
+  vars:
+    rhc_state: present
+    rhc_organization: "{{ rhc_organization if rhc_organization | length > 0 else omit }}"
+    rhc_auth: "{{ __rhc_auth | default(omit) }}"
+    rhc_server: "{{ __rhc_server | default(omit) }}"
+    rhc_baseurl: "{{ rhc_baseurl if rhc_baseurl | length > 0 else omit }}"
+    rhc_repositories: "{{ __rhc_repositories | default(omit) }}"
+    rhc_release: "{{ __rhc_release | default(omit) }}"
+    rhc_insights: "{{ __rhc_insights | default(omit) }}"
+    rhc_proxy: "{{ __rhc_proxy | default(omit) }}"
+    rhc_environments: "{{ rhc_environments if rhc_environments | length > 0 else omit }}"
+  tags: [create]
+
+- name: Verify registration
+  ansible.builtin.command: subscription-manager identity
+  register: registration_verify
+  changed_when: false
+  failed_when: registration_verify.rc != 0
+  tags: [create]
+
+- name: Display registration status
+  ansible.builtin.debug:
+    msg:
+      - "==============================================="
+      - "Registration Complete!"
+      - "==============================================="
+      - "{{ registration_verify.stdout_lines }}"
+      - "==============================================="
+  tags: [create]
+
+- name: Check enabled repositories
+  ansible.builtin.command: subscription-manager repos --list-enabled
+  register: enabled_repos
+  changed_when: false
+  tags: [create]
+
+- name: Display enabled repositories
+  ansible.builtin.debug:
+    msg: "{{ enabled_repos.stdout_lines }}"
+  tags: [create]
+
+- name: Verify Insights registration
+  ansible.builtin.command: insights-client --status
+  register: insights_status
+  changed_when: false
+  failed_when: false
+  when: rhc_insights_state == "present"
+  tags: [create]
+
+- name: Display Insights status
+  ansible.builtin.debug:
+    msg: "{{ insights_status.stdout_lines }}"
+  when:
+    - rhc_insights_state == "present"
+    - insights_status.stdout is defined
+  tags: [create]

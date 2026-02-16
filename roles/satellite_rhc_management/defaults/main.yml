@@ -1,0 +1,74 @@
+---
+# defaults file for satellite_rhc_management
+
+# ==============================================================================
+# AUTHENTICATION
+# ==============================================================================
+# Choose ONE authentication method:
+
+# Method 1: Activation key (recommended for automation)
+rhc_auth_activation_key: ""
+rhc_organization: ""
+
+# Method 2: Username/password (use Ansible Vault)
+rhc_auth_username: ""
+rhc_auth_password: ""
+
+# ==============================================================================
+# SATELLITE REPOSITORY CONFIGURATION
+# ==============================================================================
+# Automatically enable Satellite repositories
+# Supports RHEL 8, 9, and 10
+rhc_enable_satellite_repos: false
+rhc_satellite_version: "6.15"
+
+# Custom repository list (alternative to automatic Satellite repos)
+rhc_custom_repositories: []
+# Example:
+#  - name: "rhel-8-for-x86_64-baseos-rpms"
+#    state: enabled
+#  - name: "rhel-8-for-x86_64-appstream-rpms"
+#    state: enabled
+
+# ==============================================================================
+# INSIGHTS CONFIGURATION
+# ==============================================================================
+rhc_insights_state: present
+rhc_insights_autoupdate: true
+rhc_insights_remediation: present  # Only works on RHEL 8.4+
+rhc_insights_display_name: "{{ ansible_fqdn }}"
+rhc_insights_tags: {}
+# Example:
+#   datacenter: dc1
+#   role: satellite
+#   environment: production
+
+# ==============================================================================
+# SERVER CONFIGURATION
+# ==============================================================================
+# Satellite server URL (for registering TO Satellite, not for Satellite server itself)
+rhc_satellite_url: ""
+
+# Release lock (e.g., "8.9" to lock to RHEL 8.9)
+rhc_release_lock: ""
+
+# Environments (for Satellite content views)
+rhc_environments: []
+
+# ==============================================================================
+# PROXY CONFIGURATION
+# ==============================================================================
+rhc_proxy_hostname: ""
+rhc_proxy_port: ""
+rhc_proxy_scheme: "http"  # http or https
+rhc_proxy_username: ""
+rhc_proxy_password: ""
+
+# ==============================================================================
+# ADVANCED SETTINGS (usually not needed)
+# ==============================================================================
+rhc_server_hostname: ""
+rhc_server_port: ""
+rhc_server_prefix: ""
+rhc_server_insecure: false
+rhc_baseurl: ""
