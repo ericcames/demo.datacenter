@@ -1,4 +1,4 @@
-ssh_key_name: my_public_ssh_key
+ssh_key_name: my_public_ssh_key_tf
 aws_region: us-west-1
 vpc_name: Data-Center-CA
 # This must be unique at aws

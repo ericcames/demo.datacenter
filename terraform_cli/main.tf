@@ -134,7 +134,7 @@ resource "aws_security_group" "web_sg" {
 module "key_pair" {
   source = "terraform-aws-modules/key-pair/aws"
 
-  key_name   = "my_public_ssh_key"
+  key_name   = "my_public_ssh_key_tf"
   public_key = data.http.my_file.response_body
 }
 
