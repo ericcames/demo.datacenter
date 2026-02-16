@@ -1,0 +1,36 @@
+---
+galaxy_info:
+  role_name: infoblox_setup
+  author: DC1 Infrastructure Team
+  description: Configure Infoblox NIOS admin password and create AAP 2.6 credentials
+  company: DC1 Datacenter
+  
+  license: MIT
+  
+  min_ansible_version: "2.9"
+  
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+        - "10"
+  
+  galaxy_tags:
+    - infoblox
+    - nios
+    - ipam
+    - dns
+    - dhcp
+    - network
+    - automation
+    - aap
+    - awx
+    - ansible
+    - credentials
+
+dependencies: []
+
+collections:
+  - infoblox.nios_modules
+  - ansible.controller

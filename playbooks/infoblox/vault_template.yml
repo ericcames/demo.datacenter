@@ -1,0 +1,22 @@
+# Ansible Vault Template for Infoblox Setup
+# 
+# Create encrypted vault file:
+#   ansible-vault create group_vars/all/vault.yml
+# 
+# Or encrypt this file:
+#   ansible-vault encrypt vault_template.yml
+# 
+# Then copy to your inventory:
+#   cp vault_template.yml group_vars/all/vault.yml
+
+---
+# Infoblox Passwords
+vault_infoblox_admin_password: "YourSecureAdminPassword123!"
+vault_infoblox_ansible_password: "YourSecureAnsiblePassword123!"
+
+# AAP/AWX Password
+vault_aap_password: "YourSecureAAPPassword123!"
+
+# Optional: Proxy credentials if needed
+# vault_proxy_user: "proxyuser"
+# vault_proxy_password: "ProxyPassword123!"

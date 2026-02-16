@@ -1,0 +1,29 @@
+---
+# tasks file for infoblox_setup
+
+- name: Include validation tasks
+  ansible.builtin.include_tasks: validate.yml
+  tags: [always]
+
+- name: Include Infoblox setup tasks
+  ansible.builtin.include_tasks: setup_infoblox.yml
+  when: not infoblox_skip_password_change or infoblox_create_ansible_user
+  tags: [infoblox]
+
+- name: Include AAP credential setup tasks
+  ansible.builtin.include_tasks: setup_aap_credential.yml
+  when: not infoblox_skip_aap_credential
+  tags: [aap, credential]
+
+- name: Display setup summary
+  ansible.builtin.debug:
+    msg:
+      - "==============================================="
+      - "Infoblox Setup Complete"
+      - "==============================================="
+      - "  Infoblox Host: {{ infoblox_host }}"
+      - "  Admin Password: {{ 'Changed' if not infoblox_skip_password_change else 'Unchanged' }}"
+      - "  Ansible User: {{ 'Created' if infoblox_create_ansible_user and not infoblox_skip_user_creation else 'Skipped' }}"
+      - "  AAP Credential: {{ 'Created' if not infoblox_skip_aap_credential else 'Skipped' }}"
+      - "==============================================="
+  tags: [always]

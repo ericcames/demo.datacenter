@@ -1,0 +1,48 @@
+---
+# Validation tasks for infoblox_setup role
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - infoblox_host is defined
+      - infoblox_host | length > 0
+      - infoblox_admin_password is defined
+      - infoblox_admin_password | length > 0
+    fail_msg: "Required variables not set. Ensure infoblox_host and infoblox_admin_password are defined."
+    success_msg: "Required Infoblox variables validated"
+
+- name: Validate AAP variables if not skipping
+  ansible.builtin.assert:
+    that:
+      - aap_host is defined
+      - aap_host | length > 0
+      - aap_username is defined
+      - aap_username | length > 0
+      - aap_password is defined
+      - aap_password | length > 0
+    fail_msg: "Required AAP variables not set. Set aap_host, aap_username, and aap_password or use infoblox_skip_aap_credential: true"
+    success_msg: "AAP variables validated"
+  when: not infoblox_skip_aap_credential
+
+- name: Validate ansible user variables if creating user
+  ansible.builtin.assert:
+    that:
+      - infoblox_ansible_username is defined
+      - infoblox_ansible_username | length > 0
+      - infoblox_ansible_password is defined
+      - infoblox_ansible_password | length > 0
+    fail_msg: "Ansible user credentials not set. Define infoblox_ansible_username and infoblox_ansible_password or use infoblox_create_ansible_user: false"
+    success_msg: "Ansible user variables validated"
+  when:
+    - infoblox_create_ansible_user
+    - not infoblox_skip_user_creation
+
+- name: Display configuration summary
+  ansible.builtin.debug:
+    msg:
+      - "Infoblox Setup Configuration:"
+      - "  Host: {{ infoblox_host }}"
+      - "  WAPI Version: {{ infoblox_wapi_version }}"
+      - "  Change Admin Password: {{ not infoblox_skip_password_change }}"
+      - "  Create Ansible User: {{ infoblox_create_ansible_user and not infoblox_skip_user_creation }}"
+      - "  Setup AAP Credential: {{ not infoblox_skip_aap_credential }}"

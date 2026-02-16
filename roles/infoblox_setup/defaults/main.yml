@@ -1,0 +1,62 @@
+---
+# defaults file for infoblox_setup
+
+# ==============================================================================
+# INFOBLOX CONFIGURATION
+# ==============================================================================
+# Infoblox connection details
+infoblox_host: "infoblox.dc1.example.com"
+infoblox_wapi_version: "2.12"  # NIOS WAPI version (adjust for your version)
+
+# Initial admin credentials (default Infoblox credentials)
+infoblox_initial_admin_username: "admin"
+infoblox_initial_admin_password: "infoblox"
+
+# New admin password (REQUIRED - use Ansible Vault)
+infoblox_admin_password: ""
+
+# SSL certificate validation
+infoblox_validate_certs: false
+
+# ==============================================================================
+# INFOBLOX USER MANAGEMENT
+# ==============================================================================
+# Create dedicated ansible automation user
+infoblox_create_ansible_user: true
+infoblox_ansible_username: "ansible"
+infoblox_ansible_password: ""  # Use Ansible Vault
+infoblox_ansible_email: "ansible@{{ infoblox_host | regex_replace('^[^.]+\\.', '') }}"
+infoblox_ansible_admin_group: "admin-group"
+infoblox_ansible_comment: "Ansible Automation Service Account"
+
+# ==============================================================================
+# AAP (ANSIBLE AUTOMATION PLATFORM) CONFIGURATION
+# ==============================================================================
+# AAP/AWX connection details
+aap_host: "https://aap.dc1.example.com"
+aap_username: "admin"
+aap_password: ""  # Use Ansible Vault
+aap_validate_certs: true
+
+# Infoblox credential settings in AAP
+aap_infoblox_credential_name: "DC1 Infoblox"
+aap_infoblox_credential_description: "Infoblox NIOS credential for DC1 network automation"
+aap_infoblox_organization: "Default"
+
+# Infoblox credential details (what AAP will use to connect to Infoblox)
+# This can be admin or the ansible service account
+aap_infoblox_username: "{{ infoblox_ansible_username if infoblox_create_ansible_user else infoblox_initial_admin_username }}"
+aap_infoblox_password: "{{ infoblox_ansible_password if infoblox_create_ansible_user else infoblox_admin_password }}"
+aap_infoblox_host: "{{ infoblox_host }}"
+
+# ==============================================================================
+# ROLE BEHAVIOR
+# ==============================================================================
+# Skip certain operations
+infoblox_skip_password_change: false
+infoblox_skip_aap_credential: false
+infoblox_skip_user_creation: false
+
+# Retry settings
+infoblox_connection_retries: 3
+infoblox_connection_delay: 5

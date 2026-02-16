@@ -1,0 +1,114 @@
+---
+# Setup Infoblox NIOS tasks
+
+- name: Test initial Infoblox connectivity
+  ansible.builtin.uri:
+    url: "https://{{ infoblox_host }}/wapi/v{{ infoblox_wapi_version }}/network"
+    method: GET
+    user: "{{ infoblox_initial_admin_username }}"
+    password: "{{ infoblox_initial_admin_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ infoblox_validate_certs }}"
+    status_code: [200, 401]  # 401 if password already changed
+  register: infoblox_initial_test
+  failed_when: false
+  changed_when: false
+  tags: [infoblox, test]
+
+- name: Display initial connectivity test result
+  ansible.builtin.debug:
+    msg: "Initial credentials {{ 'valid' if infoblox_initial_test.status == 200 else 'invalid (password may have been changed)' }}"
+  tags: [infoblox, test]
+
+- name: Update admin password
+  infoblox.nios_modules.nios_adminuser:
+    name: "{{ infoblox_initial_admin_username }}"
+    password: "{{ infoblox_admin_password }}"
+    state: present
+    provider:
+      host: "{{ infoblox_host }}"
+      username: "{{ infoblox_initial_admin_username }}"
+      password: "{{ infoblox_initial_admin_password }}"
+  connection: local
+  when:
+    - not infoblox_skip_password_change
+    - infoblox_initial_test.status == 200
+  register: admin_password_change
+  tags: [infoblox, password]
+
+- name: Display password change result
+  ansible.builtin.debug:
+    msg: "Admin password {{ 'updated successfully' if admin_password_change is changed else 'already set or skipped' }}"
+  when: not infoblox_skip_password_change
+  tags: [infoblox, password]
+
+- name: Verify new admin credentials
+  ansible.builtin.uri:
+    url: "https://{{ infoblox_host }}/wapi/v{{ infoblox_wapi_version }}/network"
+    method: GET
+    user: "{{ infoblox_initial_admin_username }}"
+    password: "{{ infoblox_admin_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ infoblox_validate_certs }}"
+    status_code: 200
+  register: infoblox_verify_admin
+  retries: "{{ infoblox_connection_retries }}"
+  delay: "{{ infoblox_connection_delay }}"
+  until: infoblox_verify_admin.status == 200
+  changed_when: false
+  when: not infoblox_skip_password_change
+  tags: [infoblox, verify]
+
+- name: Create ansible automation user
+  infoblox.nios_modules.nios_adminuser:
+    name: "{{ infoblox_ansible_username }}"
+    password: "{{ infoblox_ansible_password }}"
+    admin_groups: "{{ infoblox_ansible_admin_group }}"
+    email: "{{ infoblox_ansible_email }}"
+    comment: "{{ infoblox_ansible_comment }}"
+    state: present
+    provider:
+      host: "{{ infoblox_host }}"
+      username: "{{ infoblox_initial_admin_username }}"
+      password: "{{ infoblox_admin_password }}"
+  connection: local
+  when:
+    - infoblox_create_ansible_user
+    - not infoblox_skip_user_creation
+  register: ansible_user_creation
+  tags: [infoblox, user]
+
+- name: Display ansible user creation result
+  ansible.builtin.debug:
+    msg: "Ansible user '{{ infoblox_ansible_username }}' {{ 'created successfully' if ansible_user_creation is changed else 'already exists or skipped' }}"
+  when:
+    - infoblox_create_ansible_user
+    - not infoblox_skip_user_creation
+  tags: [infoblox, user]
+
+- name: Verify ansible user credentials
+  ansible.builtin.uri:
+    url: "https://{{ infoblox_host }}/wapi/v{{ infoblox_wapi_version }}/network"
+    method: GET
+    user: "{{ infoblox_ansible_username }}"
+    password: "{{ infoblox_ansible_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ infoblox_validate_certs }}"
+    status_code: 200
+  register: infoblox_verify_ansible
+  retries: "{{ infoblox_connection_retries }}"
+  delay: "{{ infoblox_connection_delay }}"
+  until: infoblox_verify_ansible.status == 200
+  changed_when: false
+  when:
+    - infoblox_create_ansible_user
+    - not infoblox_skip_user_creation
+  tags: [infoblox, verify]
+
+- name: Display Infoblox setup completion
+  ansible.builtin.debug:
+    msg:
+      - "Infoblox configuration complete"
+      - "  Admin password: Updated"
+      - "  Ansible user: {{ 'Created (' + infoblox_ansible_username + ')' if infoblox_create_ansible_user and not infoblox_skip_user_creation else 'Not created' }}"
+  tags: [infoblox]

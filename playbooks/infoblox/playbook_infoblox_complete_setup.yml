@@ -1,0 +1,124 @@
+---
+# Complete Infoblox Setup Example for DC1
+
+- name: Setup Infoblox in DC1 Datacenter
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    # ===========================================================================
+    # INFOBLOX CONFIGURATION
+    # ===========================================================================
+    infoblox_host: "infoblox.dc1.example.com"
+    infoblox_wapi_version: "2.12"
+    
+    # Initial credentials (Infoblox defaults)
+    infoblox_initial_admin_username: "admin"
+    infoblox_initial_admin_password: "infoblox"
+    
+    # New admin password (use Ansible Vault)
+    infoblox_admin_password: "{{ vault_infoblox_admin_password }}"
+    
+    # Create dedicated automation user
+    infoblox_create_ansible_user: true
+    infoblox_ansible_username: "ansible"
+    infoblox_ansible_password: "{{ vault_infoblox_ansible_password }}"
+    infoblox_ansible_email: "ansible@dc1.example.com"
+    
+    # ===========================================================================
+    # AAP CONFIGURATION
+    # ===========================================================================
+    aap_host: "https://aap.dc1.example.com"
+    aap_username: "admin"
+    aap_password: "{{ vault_aap_password }}"
+    aap_validate_certs: false  # Set to true in production
+    
+    # Infoblox credential in AAP
+    aap_infoblox_credential_name: "DC1 Infoblox"
+    aap_infoblox_credential_description: "Infoblox NIOS for DC1 network automation (IPAM, DNS, DHCP)"
+    aap_infoblox_organization: "DC1 Operations"
+
+  pre_tasks:
+    - name: Display setup plan
+      ansible.builtin.debug:
+        msg:
+          - "==============================================="
+          - "Infoblox Setup Plan"
+          - "==============================================="
+          - "  Target: {{ infoblox_host }}"
+          - "  Actions:"
+          - "    1. Change admin password"
+          - "    2. Create ansible service account"
+          - "    3. Create AAP credential"
+          - "==============================================="
+
+    - name: Verify Ansible Vault variables are set
+      ansible.builtin.assert:
+        that:
+          - vault_infoblox_admin_password is defined
+          - vault_infoblox_ansible_password is defined
+          - vault_aap_password is defined
+        fail_msg: |
+          Required vault variables not set.
+          Create vault file with:
+            ansible-vault create group_vars/all/vault.yml
+          And define:
+            vault_infoblox_admin_password
+            vault_infoblox_ansible_password
+            vault_aap_password
+
+  roles:
+    - infoblox_setup
+
+  post_tasks:
+    - name: Display next steps
+      ansible.builtin.debug:
+        msg:
+          - "==============================================="
+          - "Infoblox Setup Complete!"
+          - "==============================================="
+          - ""
+          - "Infoblox is now ready for automation:"
+          - "  • Admin password changed"
+          - "  • Ansible service account created"
+          - "  • AAP credential configured"
+          - ""
+          - "Next steps:"
+          - ""
+          - "1. Test Infoblox credential in AAP:"
+          - "   - Create a test job template"
+          - "   - Use the '{{ aap_infoblox_credential_name }}' credential"
+          - "   - Run a simple network query"
+          - ""
+          - "2. Configure Infoblox inventory source in AAP:"
+          - "   - Add Infoblox as inventory source"
+          - "   - Sync network inventory"
+          - ""
+          - "3. Create network automation workflows:"
+          - "   - DNS record management"
+          - "   - DHCP reservation automation"
+          - "   - IP address allocation"
+          - ""
+          - "==============================================="
+
+- name: Verify Infoblox Integration
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  
+  tasks:
+    - name: Test Infoblox connection with new credentials
+      ansible.builtin.uri:
+        url: "https://{{ infoblox_host }}/wapi/v{{ infoblox_wapi_version }}/network"
+        method: GET
+        user: "{{ infoblox_ansible_username }}"
+        password: "{{ vault_infoblox_ansible_password }}"
+        force_basic_auth: true
+        validate_certs: false
+      register: infoblox_test
+      changed_when: false
+
+    - name: Display test result
+      ansible.builtin.debug:
+        msg: "Infoblox connection test: {{ 'SUCCESS' if infoblox_test.status == 200 else 'FAILED' }}"

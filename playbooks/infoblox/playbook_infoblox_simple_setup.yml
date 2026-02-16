@@ -1,0 +1,18 @@
+---
+# Simple Infoblox Setup
+
+- name: Setup Infoblox
+  hosts: localhost
+  connection: local
+  
+  vars:
+    infoblox_host: "infoblox.dc1.example.com"
+    infoblox_admin_password: "{{ vault_infoblox_admin_password }}"
+    infoblox_ansible_password: "{{ vault_infoblox_ansible_password }}"
+    
+    aap_host: "https://aap.dc1.example.com"
+    aap_username: "admin"
+    aap_password: "{{ vault_aap_password }}"
+  
+  roles:
+    - infoblox_setup
