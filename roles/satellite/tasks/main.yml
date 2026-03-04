@@ -26,7 +26,7 @@
         - satellite-{{ satellite_version }}-for-rhel-8-x86_64-rpms
         - satellite-maintenance-{{ satellite_version }}-for-rhel-8-x86_64-rpms
       when: ansible_distribution_major_version == '8' and satellite_version >= 6.11
-      community.general.rhsm_repository:
+      redhat.rhel_system_roles.rhsm_repository:
         name: '{{ item }}'
         state: enabled
 
