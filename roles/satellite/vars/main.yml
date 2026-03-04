@@ -1,0 +1,8 @@
+---
+satellite_username: USERNAME
+satellite_password: PASSWORD
+satellite_organization: "IT Service Automation"
+satellite_location: California
+satellite_version: 6.17
+satellite_user_list_vault: user_list.yml
+satellite_manifest: AmesCO-Satellite-manifest.zip

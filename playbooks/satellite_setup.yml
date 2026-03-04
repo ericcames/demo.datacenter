@@ -32,6 +32,12 @@
       ansible.builtin.include_role:
         name: linux_post_install
 
+    - name: Run the Satellite install
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: satellite
+
     - name: Include the redhat subscription manager role
       tags:
         - remove
