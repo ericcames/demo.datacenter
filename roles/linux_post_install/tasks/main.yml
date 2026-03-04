@@ -1,7 +1,7 @@
 ---
 - name: Linux post install aka configuration management
-  # tags:
-  #   - create
+  tags:
+    - create
   become: true
   block:
 
