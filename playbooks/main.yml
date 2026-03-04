@@ -1,4 +1,15 @@
 ---
+- name: Register Satellite server with redhat
+  hosts: satellite
+
+  tasks:
+
+    - name: Include the redhat subscription manager role
+      tags:
+        - remove
+      ansible.builtin.include_role:
+        name: rhsm
+
 - name: Provision demo datacenter
   hosts: localhost
   connection: local

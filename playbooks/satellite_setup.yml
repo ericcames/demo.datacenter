@@ -4,42 +4,23 @@
 
   tasks:
 
-    - name: Grab vault from remote url
+    - name: Gather up our remote vaulted variables
       tags:
         - create
-      delegate_to: localhost
-      ansible.builtin.get_url:
-        url: '{{ my_remote_vault }}'
-        dest: files/remotevault.yml
-        mode: '0644'
+      block:
 
-    - name: Include configurations
-      tags:
-        - create
-      delegate_to: localhost
-      ansible.builtin.include_vars:
-        file: files/remotevault.yml
+        - name: Get our remote vaulted variables
+          ansible.builtin.include_role:
+            name: remote_vault
 
-    - name: Include the redhat subscription manager role
-      tags:
-        - create
-      ansible.builtin.include_role:
-        name: rhsm
+        - name: Include the redhat subscription manager role
+          ansible.builtin.include_role:
+            name: rhsm
 
-    - name: Run the Linux post install
-      tags:
-        - create
-      ansible.builtin.include_role:
-        name: linux_post_install
+        - name: Run the Linux post install
+          ansible.builtin.include_role:
+            name: linux_post_install
 
-    - name: Run the Satellite install
-      tags:
-        - create
-      ansible.builtin.include_role:
-        name: satellite
-
-    - name: Include the redhat subscription manager role
-      tags:
-        - remove
-      ansible.builtin.include_role:
-        name: rhsm
+        - name: Run the Satellite install
+          ansible.builtin.include_role:
+            name: satellite
