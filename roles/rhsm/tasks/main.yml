@@ -20,9 +20,11 @@
             keys:
               - "{{ rh_activation_key }}"
         rhc_organization: '{{ rh_org_id }}'
+        rhc_state: present
         rhc_insights:
           autoupdate: true
           remediation: present
+          state: present
       ansible.builtin.include_role:
         name: redhat.rhel_system_roles.rhc
 
