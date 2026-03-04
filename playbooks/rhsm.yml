@@ -5,29 +5,31 @@
   tasks:
 
     - name: Grab vault from remote url
-      delegate_to: localhost
       tags:
         - create
+      delegate_to: localhost
       ansible.builtin.get_url:
         url: '{{ my_remote_vault }}'
         dest: files/remotevault.yml
         mode: '0644'
 
     - name: Include configurations
-      delegate_to: localhost
       tags:
         - create
+      delegate_to: localhost
       ansible.builtin.include_vars:
         file: files/remotevault.yml
 
     - name: Include the redhat subscription manager role
       tags:
         - create
+      become: true
       ansible.builtin.include_role:
         name: rhsm
 
     - name: Include the redhat subscription manager role
       tags:
         - remove
+      become: true
       ansible.builtin.include_role:
         name: rhsm
