@@ -1,0 +1,13 @@
+---
+- name: Register Satellite server with redhat
+  hosts: satellite
+
+  tasks:
+
+    # - name: Get our remote vaulted variables
+    #   ansible.builtin.include_role:
+    #     name: remote_vault
+
+    - name: Run the Satellite install
+      ansible.builtin.include_role:
+        name: satellite
