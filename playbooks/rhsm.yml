@@ -4,6 +4,20 @@
 
   tasks:
 
+    - name: Grab vault from remote url
+      tags:
+        - create
+      ansible.builtin.get_url:
+        url: '{{ my_remote_vault }}'
+        dest: files/remotevault.yml
+        mode: '0644'
+
+    - name: Include configurations
+      tags:
+        - create
+      ansible.builtin.include_vars:
+        file: files/remotevault.yml
+
     - name: Include the redhat subscription manager role
       tags:
         - create
