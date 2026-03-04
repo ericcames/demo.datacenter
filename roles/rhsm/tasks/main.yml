@@ -1,5 +1,5 @@
 ---
-- name: Registering system with Red Hat
+- name: Manage the Red Hat Registration process
   tags:
     - create
   become: true
@@ -28,7 +28,7 @@
       ansible.builtin.include_role:
         name: redhat.rhel_system_roles.rhc
 
-- name: Un-Registering system with Red Hat
+- name: Manage the Red Hat Registration process
   tags:
     - remove
   become: true

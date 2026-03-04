@@ -1,5 +1,5 @@
 ---
-- name: Register Satellite server with redhat
+- name: Manage Red Hat Registration
   hosts: satellite
 
   tasks:
@@ -10,7 +10,7 @@
       ansible.builtin.include_role:
         name: rhsm
 
-- name: Provision demo datacenter
+- name: Manage datacenter
   hosts: localhost
   connection: local
 

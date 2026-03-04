@@ -1,5 +1,5 @@
 ---
-- name: Register Satellite server with redhat
+- name: Satellite stem cell becomes our satellite server
   hosts: satellite
 
   tasks:
@@ -16,13 +16,13 @@
       ansible.builtin.include_role:
         name: rhsm
 
-    - name: Run the Linux post install
-      tags:
-        - create
+    - name: Include the linux post role
+      # tags:
+      #   - create
       ansible.builtin.include_role:
         name: linux_post_install
 
-    - name: Run the Satellite install
+    - name: Include the Satellite role
       tags:
         - create
       ansible.builtin.include_role:
