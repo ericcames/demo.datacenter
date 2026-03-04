@@ -64,7 +64,7 @@
       failed_when: result.rc > 1
       ansible.builtin.command: |
           satellite-installer --scenario satellite
-          --foreman-initial-organization {{ satellite_organization }}
+          --foreman-initial-organization "{{ satellite_organization }}"
           --foreman-initial-location {{ satellite_location }}
           --foreman-initial-admin-username {{ satellite_username }}
           --foreman-initial-admin-password {{ satellite_password }}
