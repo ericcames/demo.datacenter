@@ -5,6 +5,7 @@
   tasks:
 
     - name: Grab vault from remote url
+      delegate_to: localhost
       tags:
         - create
       ansible.builtin.get_url:
@@ -13,6 +14,7 @@
         mode: '0644'
 
     - name: Include configurations
+      delegate_to: localhost
       tags:
         - create
       ansible.builtin.include_vars:
