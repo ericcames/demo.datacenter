@@ -2,6 +2,7 @@
 - name: Registering system with Red Hat
   tags:
     - create
+  become: true
   block:
 
     # - name: Setting the hostname to the public hostname
@@ -28,6 +29,7 @@
 - name: Un-Registering system with Red Hat
   tags:
     - remove
+  become: true
   block:
 
     - name: Un-Register and Un-subscribe the system

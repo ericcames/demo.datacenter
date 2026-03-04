@@ -1,7 +1,6 @@
 ---
 - name: Register Satellite server with redhat
   hosts: satellite
-  become: true
 
   tasks:
 
