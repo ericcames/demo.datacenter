@@ -1,6 +1,7 @@
 ---
 - name: Register Satellite server with redhat
   hosts: satellite
+  become: true
 
   tasks:
 
@@ -23,13 +24,11 @@
     - name: Include the redhat subscription manager role
       tags:
         - create
-      become: true
       ansible.builtin.include_role:
         name: rhsm
 
     - name: Include the redhat subscription manager role
       tags:
         - remove
-      become: true
       ansible.builtin.include_role:
         name: rhsm
