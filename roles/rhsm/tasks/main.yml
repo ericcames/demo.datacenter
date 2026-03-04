@@ -5,9 +5,9 @@
   become: true
   block:
 
-    # - name: Setting the hostname to the public hostname
-    #   ansible.builtin.hostname:
-    #     name: "{{ satellite_sat6_fqdn }}"
+    - name: Setting the hostname to the public hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
 
     - name: Debug
       ansible.builtin.debug:
