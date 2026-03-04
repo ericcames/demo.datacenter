@@ -1,7 +1,0 @@
----
-controller_execution_environments:
-  - name: hashicorp_ee
-    image: quay.io/zigfreed/hashicorp_ee:latest
-    pull: missing
-    organization: "{{ my_organization }}"
-    credential: quay.io
