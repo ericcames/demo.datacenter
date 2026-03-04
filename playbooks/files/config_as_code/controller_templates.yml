@@ -12,6 +12,7 @@ controller_templates:
     credentials:
       - "{{ my_aws_credential }}"
       - "{{ my_aap_credential }}"
+      - AWS MAchine Credential
     extra_vars:
       my_remote_ssh_pub_key: "{{ my_remote_ssh_pub_key }}"
       ansible_python_interpreter: /usr/bin/python3
