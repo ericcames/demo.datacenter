@@ -4,23 +4,26 @@
 
   tasks:
 
-    - name: Gitty up
+    - name: Get our remote vaulted variables
       tags:
         - create
-      block:
+      ansible.builtin.include_role:
+        name: remote_vault
 
-        - name: Get our remote vaulted variables
-          ansible.builtin.include_role:
-            name: remote_vault
+    - name: Include the redhat subscription manager role
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: rhsm
 
-        - name: Include the redhat subscription manager role
-          ansible.builtin.include_role:
-            name: rhsm
+    - name: Run the Linux post install
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: linux_post_install
 
-        - name: Run the Linux post install
-          ansible.builtin.include_role:
-            name: linux_post_install
-
-        - name: Run the Satellite install
-          ansible.builtin.include_role:
-            name: satellite
+    - name: Run the Satellite install
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: satellite
