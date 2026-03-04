@@ -2,6 +2,7 @@
 - name: Linux post install aka configuration management
   tags:
     - create
+  become: true
   block:
 
     - name: Install Chrony
