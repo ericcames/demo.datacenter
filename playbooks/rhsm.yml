@@ -26,6 +26,12 @@
       ansible.builtin.include_role:
         name: rhsm
 
+    - name: Run the Linux post install
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: linux_post_install
+
     - name: Include the redhat subscription manager role
       tags:
         - remove
