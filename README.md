@@ -28,10 +28,10 @@ Activate the subscriptions needed for Infoblox, F5, Palo Alto, appliances. Makes
 
 New Variables for your online vault
 
-| Key | Description |
-|---|---|
-| rh_activation_key | Red Hat activation key |
-| rh_org_id | rh_org_id |
+| Key | Description | Purpose |
+|---|---|---|
+| rh_activation_key | Red Hat activation key | Used by RHSM role |
+| rh_org_id | Red Hat Org ID | Used by RHSM role |
 
 
 Run workflow for Datacenter 1 (DC1)
