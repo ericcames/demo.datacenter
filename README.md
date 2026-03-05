@@ -26,6 +26,14 @@ Activate the subscriptions needed for Infoblox, F5, Palo Alto, appliances. Makes
 2. https://aws.amazon.com/marketplace/procurement/?productId=cd5685be-9635-460e-9448-20bd5bead545&offerId=c5mtwrozlfns1fnawk1nvx2dh
 3. https://aws.amazon.com/marketplace/procurement/?productId=f1260463-68e1-4bfb-bf2e-075c2664c1d7&offerId=e9yfvyj3uag5uo5j2hjikv74n
 
+New Variables for your online vault
+
+| Key | Description | Purpose |
+|---|---|---|
+| rh_activation_key | Red Hat activation key | Used by RHSM role |
+| rh_org_id | Red Hat Org ID | Used by RHSM role |
+
+
 Run workflow for Datacenter 1 (DC1)
 =========
 The workflow will build the infrastructure in the virtual datacenter as well as configure the various capabilities.
