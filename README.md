@@ -30,9 +30,8 @@ New Variables for your online vault
 
 | Key | Description | Purpose |
 |---|---|---|
-| rh_activation_key | Red Hat activation key | Used by RHSM role |
-| rh_org_id | Red Hat Org ID | Used by RHSM role |
-
+| rh_activation_key | Red Hat activation key | Used by the rhsm role |
+| rh_org_id | Red Hat Org ID | Used by the rhsm role |
 
 Run workflow for Datacenter 1 (DC1)
 =========
