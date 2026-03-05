@@ -27,7 +27,9 @@ Activate the subscriptions needed for Infoblox, F5, Palo Alto, appliances. Makes
 3. https://aws.amazon.com/marketplace/procurement/?productId=f1260463-68e1-4bfb-bf2e-075c2664c1d7&offerId=e9yfvyj3uag5uo5j2hjikv74n
 
 New Variables for your online vault
+
 | Key | Description |
+|---|---|
 | rh_activation_key | Red Hat activation key |
 | rh_org_id | rh_org_id |
 
