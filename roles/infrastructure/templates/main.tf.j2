@@ -136,7 +136,7 @@ module "key_pair" {
   public_key = data.http.my_file.response_body
 }
 
-{# resource "aws_instance" "app_server" {
+resource "aws_instance" "app_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_a.id
@@ -148,9 +148,9 @@ module "key_pair" {
     Application = "Ubuntu"
     Environment = "development"
   }
-} #}
+}
 
-{# resource "aws_instance" "f5" {
+resource "aws_instance" "f5" {
   ami                    = data.aws_ami.f5_21.id
   instance_type          = "m5.xlarge"
   subnet_id              = aws_subnet.public_a.id
@@ -162,9 +162,9 @@ module "key_pair" {
     Application = "f5demo"
     Environment = "development"
   }
-} #}
+}
 
-{# resource "aws_instance" "RHEL9_web_A" {
+resource "aws_instance" "RHEL9_web_A" {
   ami                    = data.aws_ami.rhel9.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_a.id
@@ -176,9 +176,9 @@ module "key_pair" {
     Application = "webservers"
     Environment = "development"
   }
-} #}
+}
 
-{# resource "aws_instance" "RHEL9_web_C" {
+resource "aws_instance" "RHEL9_web_C" {
   ami                    = data.aws_ami.rhel9.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
@@ -190,9 +190,9 @@ module "key_pair" {
     Application = "webservers"
     Environment = "development"
   }
-} #}
+}
 
-{# resource "aws_instance" "win25" {
+resource "aws_instance" "win25" {
   ami                    = data.aws_ami.win25.id
   instance_type          = "m5.xlarge"
   subnet_id              = aws_subnet.public_a.id
@@ -205,7 +205,7 @@ module "key_pair" {
     Application = "ad"
     Environment = "development"
   }
-} #}
+}
 
 resource "aws_instance" "satellite" {
   # RHEL 9
@@ -222,7 +222,7 @@ resource "aws_instance" "satellite" {
   }
 }
 
-{# resource "aws_instance" "panos" {
+resource "aws_instance" "panos" {
   ami                    = data.aws_ami.panos.id
   instance_type          = "c5n.xlarge"
   subnet_id              = aws_subnet.public_a.id
@@ -234,9 +234,9 @@ resource "aws_instance" "satellite" {
     Application = "panos"
     Environment = "development"
   }
-} #}
+}
 
-{# resource "aws_instance" "idm" {
+resource "aws_instance" "idm" {
   ami                    = data.aws_ami.rhel9.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
@@ -248,9 +248,9 @@ resource "aws_instance" "satellite" {
     Application = "idm"
     Environment = "development"
   }
-} #}
+}
 
-{# resource "aws_instance" "vault" {
+resource "aws_instance" "vault" {
   ami                    = data.aws_ami.rhel9.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
@@ -262,9 +262,9 @@ resource "aws_instance" "satellite" {
     Application = "vault"
     Environment = "development"
   }
-} #}
+}
 
-{# resource "aws_instance" "hashicorp" {
+resource "aws_instance" "hashicorp" {
   ami                    = data.aws_ami.rhel9.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
@@ -276,9 +276,9 @@ resource "aws_instance" "satellite" {
     Application = "hashicorp"
     Environment = "development"
   }
-} #}
+}
 
-{# resource "aws_instance" "infoblox" {
+resource "aws_instance" "infoblox" {
   ami                    = data.aws_ami.infoblox.id
   instance_type          = "m5.xlarge"
   subnet_id              = aws_subnet.public_a.id
@@ -296,4 +296,4 @@ resource "aws_instance" "satellite" {
     http_tokens   = "required"
   }
 
-} #}
+}
