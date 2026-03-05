@@ -1,0 +1,212 @@
+---
+- name: Installing Red Hat Satellite
+  tags:
+    - create
+  become: true
+  block:
+
+    - name: Include our user info
+      ansible.builtin.include_vars:
+        file: files/{{ satellite_user_list_vault }}
+
+    - name: Include our Satellite settings
+      ansible.builtin.include_vars:
+        file: files/satellite_settings.yml
+
+    - name: Ensure repositories are able to be managed by subscription-manager
+      register: result
+      changed_when: result.rc == 1
+      failed_when: result.rc > 1
+      ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
+
+    - name: Enable all repositories needed for satellite on RHEL 9
+      with_items:
+        - rhel-9-for-x86_64-appstream-rpms
+        - rhel-9-for-x86_64-baseos-rpms
+        - satellite-{{ satellite_version }}-for-rhel-9-x86_64-rpms
+        - satellite-maintenance-{{ satellite_version }}-for-rhel-9-x86_64-rpms
+      when: ansible_distribution_major_version == '9' and satellite_version >= 6.17
+      redhat.rhel_system_roles.rhsm_repository:
+        name: '{{ item }}'
+        state: enabled
+
+    - name: Install the latest version of Satellite
+      ansible.builtin.dnf:
+        name: satellite
+        state: installed
+
+    - name: Run the Satellite installer
+      register: result
+      changed_when: result.rc == 1
+      failed_when: result.rc > 1
+      ansible.builtin.command: |
+          satellite-installer --scenario satellite
+          --foreman-initial-organization "{{ satellite_organization }}"
+          --foreman-initial-location {{ satellite_location }}
+          --foreman-initial-admin-username {{ satellite_username }}
+          --foreman-initial-admin-password {{ satellite_password }}
+
+    - name: Check to see if we need a reboot
+      register: result
+      changed_when: result.rc == 1
+      failed_when: result.rc > 1
+      check_mode: false
+      ansible.builtin.command: needs-restarting -r
+
+    - name: Reboot server if needed
+      when: result.rc == 1
+      ansible.builtin.reboot:
+
+    - name: Create the Satellite users
+      no_log: true
+      loop: "{{ users }}"
+      redhat.satellite.user:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        name: "{{ item['name'] }}"
+        firstname: "{{ item['firstname'] }}"
+        lastname: "{{ item['lastname'] }}"
+        mail: "{{ item['mail'] }}"
+        description: "Tell us about yourself :-)"
+        admin: "{{ item['admin_account'] }}"
+        user_password: "{{ item['password'] }}"
+        default_organization: "{{ item['org_ids'] }}"
+        auth_source: Internal
+        timezone: "{{ item['timezone'] }}"
+        state: present
+        validate_certs: false
+        server_url: "https://{{ inventory_hostname }}"
+
+    - name: My Satellite settings
+      loop: "{{ satellite_settings }}"
+      redhat.satellite.setting:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        name: "{{ item['name'] }}"
+        value: "{{ item['value'] }}"
+        validate_certs: false
+
+    - name: Copy Manifest file
+      ansible.builtin.copy:
+        src: "files/{{ satellite_manifest }}"
+        dest: /root/
+        owner: root
+        group: root
+        mode: '0744'
+
+    - name: "Upload the RHEL developer edition manifest"
+      redhat.satellite.subscription_manifest:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        organization: "{{ satellite_organization }}"
+        state: present
+        manifest_path: "/root/{{ satellite_manifest }}"
+        validate_certs: false
+
+    - name: Adding a domain
+      redhat.satellite.domain:
+        name: "kona.services"
+        description: "Kona Services Rocks!"
+        locations:
+          - "{{ satellite_location }}"
+        organizations:
+          - "{{ satellite_organization }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        state: present
+        validate_certs: false
+
+    - name: "Create or update weekly RHEL sync plan"
+      redhat.satellite.sync_plan:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        name: "Weekly RHEL Sync"
+        organization: "{{ satellite_organization }}"
+        interval: "weekly"
+        enabled: true
+        sync_date: "2025-02-15 00:00:00 UTC"
+        state: present
+        validate_certs: false
+
+    - name: "Add a Development lifecycle environment"
+      redhat.satellite.lifecycle_environment:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        name: "Development"
+        label: "Development"
+        organization: "{{ satellite_organization }}"
+        prior: "Library"
+        description: "The Development environment"
+        state: "present"
+        validate_certs: false
+
+    - name: "Add a QA lifecycle environment"
+      redhat.satellite.lifecycle_environment:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        name: "QA"
+        label: "QA"
+        organization: "{{ satellite_organization }}"
+        prior: "Development"
+        description: "The QA environment"
+        state: "present"
+        validate_certs: false
+
+    - name: "Add a Production lifecycle environment"
+      redhat.satellite.lifecycle_environment:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        name: "Production"
+        label: "Production"
+        organization: "{{ satellite_organization }}"
+        prior: "QA"
+        description: "The Production environment"
+        state: "present"
+        validate_certs: false
+
+    - name: "Create Development content view"
+      redhat.satellite.content_view:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        name: "RHEL9 Hosts"
+        organization: "{{ satellite_organization }}"
+        validate_certs: false
+
+    - name: "Create client activation key"
+      redhat.satellite.activation_key:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        name: "RHEL9 Dev"
+        organization: "{{ satellite_organization }}"
+        validate_certs: false
+
+    - name: "Create RHEL product"
+      redhat.satellite.product:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        name: "Red Hat Enterprise Linux Server"
+        organization: "{{ satellite_organization }}"
+        state: present
+        validate_certs: false
+
+    - name: Create Hostgroups
+      loop:
+        - Satellite
+        - Webservers
+      redhat.satellite.hostgroup:
+        name: "{{ item }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ inventory_hostname }}"
+        state: present
+        validate_certs: false

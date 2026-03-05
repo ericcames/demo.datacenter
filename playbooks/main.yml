@@ -1,5 +1,16 @@
 ---
-- name: Provision demo datacenter
+- name: Manage Red Hat Registration
+  hosts: satellite
+
+  tasks:
+
+    - name: Include the redhat subscription manager role
+      tags:
+        - remove
+      ansible.builtin.include_role:
+        name: rhsm
+
+- name: Manage datacenter
   hosts: localhost
   connection: local
 

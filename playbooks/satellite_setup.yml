@@ -1,0 +1,29 @@
+---
+- name: Satellite stem cell becomes our satellite server
+  hosts: satellite
+
+  tasks:
+
+    - name: Get our remote vaulted variables
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: remote_vault
+
+    - name: Include the redhat subscription manager role
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: rhsm
+
+    - name: Include the linux post role
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: linux_post_install
+
+    - name: Include the Satellite role
+      tags:
+        - create
+      ansible.builtin.include_role:
+        name: satellite
