@@ -70,6 +70,25 @@ DC1 is a layered stack. Each layer is a prerequisite for the layers above it.
 
 ---
 
+## Layer 0 — Foundation Rework
+
+Layer 0 was previously marked Complete. A foundation review
+([`docs/reviews/opus-review-2026-05-05.md`](docs/reviews/opus-review-2026-05-05.md))
+identified work that must land before the layer can be safely declared done.
+Until the items below resolve, the layer is in **reopen / in progress** state.
+
+| Issue | Scope |
+|-------|-------|
+| [#9](https://github.com/ericcames/demo.datacenter/issues/9) | Consume CIS-hardened RHEL AMIs from `image.builder.pipeline` (tag-based discovery, owner=`self`) |
+| [#10](https://github.com/ericcames/demo.datacenter/issues/10) | Terraform state — migrate to S3 backend + DynamoDB lock; unify the two divergent state files; drop the ZIP/providers archive and `force_init: true` |
+| [#11](https://github.com/ericcames/demo.datacenter/issues/11) | Terraform lint/CI baseline — `terraform fmt`/`validate` in GitHub Actions; pre-commit mirror |
+| [#12](https://github.com/ericcames/demo.datacenter/issues/12) | Bug 4 — migrate `ansible.controller` calls in `roles/infrastructure/tasks/main.yml` to `ansible.platform` |
+
+When all four issues close and a clean end-to-end provision + destroy run
+succeeds from a fresh AWS account, mark Migration Sequence row 1 ✅ Complete.
+
+---
+
 ## Isolation Model
 
 Each sales engineer has their own completely isolated environment:
@@ -329,7 +348,7 @@ terraform destroy                # terminates instances
 
 | Step | Component | Source | Status |
 |------|-----------|--------|--------|
-| 1 | AWS Infrastructure | demo.datacenter | ✅ Complete |
+| 1 | AWS Infrastructure | demo.datacenter | 🔄 Reopen (foundation rework — see "Layer 0 — Foundation Rework" section) |
 | 2 | Red Hat Satellite | aap.dailydemo.satellite | ✅ Migrated (manifest bug open) |
 | 3 | Active Directory | aap.dailydemo.windows | 🔄 In Progress |
 | 4 | HashiCorp Vault | new | ⬜ Not Started |
@@ -371,6 +390,8 @@ terraform destroy                # terminates instances
 | Vault vs HashiCorp Enterprise | Vault is higher priority | Core demo story: secrets in Vault, not AAP |
 | Stop vs terminate/recreate | Stop/start | Preserves configured disk state; restart in minutes not hours |
 | ansible.platform vs ansible.controller | ansible.platform always | ansible.controller is legacy |
+| Terraform state strategy | S3 backend + DynamoDB lock | Replaces hand-rolled ZIP/providers archive; unifies AAP path and `terraform_cli/` onto one state file |
+| CIS image baseline | L1 for all RHEL | Matches `image.builder.pipeline` Phase 1 contract; Satellite host = L1 only; Layer 3 workloads start L1, add L2 per workload group once pipeline ships L2 lineage (see [#9](https://github.com/ericcames/demo.datacenter/issues/9)) |
 
 ---
 

@@ -12,7 +12,7 @@ DC1 is built in layers:
 
 | Layer | Component | Status |
 |-------|-----------|--------|
-| 0 | AWS Infrastructure (Terraform) | Complete |
+| 0 | AWS Infrastructure (Terraform) | 🔄 In progress (foundation rework — see PLANNING.md "Layer 0 — Foundation Rework") |
 | 1 | Satellite 6.18 | Complete |
 | 1 | Active Directory | In progress |
 | 1 | Infoblox | Provisioned, not set up |
