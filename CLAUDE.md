@@ -100,6 +100,6 @@ ansible-galaxy collection install -r collections/requirements.yml -p ./collectio
 
 ## What Not to Commit
 
-`.gitignore` excludes: `.terraform/`, `*.tfstate`, `*.tfvars`, `win25_userdata`. The `terraform_cli/terraform.tfstate` in the repo is an exception tracked intentionally — do not delete it.
+`.gitignore` excludes: `.terraform/`, `*.tfstate`, `*.tfvars`, `win25_userdata`. State files are per-developer; for shared state, see issue #10 (S3 backend + DynamoDB lock).
 
 Images belong in `docs/images/` and must be committed (not gitignored) so they render on GitHub.
