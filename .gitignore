@@ -26,3 +26,7 @@ terraform.rc
 
 # These files need to get cleaned up before I can commit them
 win25_userdata
+
+# direnv-loaded local environment; contains AWS credentials per developer.
+# Copy .envrc.example to .envrc and fill in your values.
+.envrc

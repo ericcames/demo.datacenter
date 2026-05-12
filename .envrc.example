@@ -1,0 +1,11 @@
+# Copy this file to .envrc and fill in your values.
+# .envrc is gitignored — never commit credentials.
+# Run `direnv allow` after editing.
+
+export AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY_HERE
+export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY_HERE
+export AWS_DEFAULT_REGION=us-east-1
+
+# Alternative: if you already use a named profile in ~/.aws/credentials,
+# comment out the two access-key lines above and uncomment this instead:
+# export AWS_PROFILE=your-profile-name
