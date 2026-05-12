@@ -44,21 +44,19 @@ data "aws_ami" "rhel8" {
 
 data "aws_ami" "rhel9" {
   most_recent = true
-  owners = [
-    "309956199498",
-    "self"
-  ]
+  owners      = ["self"]
+
   filter {
-    name = "name"
-    values = [
-      var.rhel9_ami_name
-    ]
+    name   = "tag:Pipeline"
+    values = ["image-builder-pipeline"]
   }
   filter {
-    name = "architecture"
-    values = [
-      var.rhel_arch
-    ]
+    name   = "tag:OS"
+    values = ["rhel9"]
+  }
+  filter {
+    name   = "tag:CIS-Level"
+    values = ["L1"]
   }
 }
 
