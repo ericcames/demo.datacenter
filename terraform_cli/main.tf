@@ -144,7 +144,7 @@ resource "aws_instance" "app_server" {
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "Ubuntu"
@@ -158,7 +158,7 @@ resource "aws_instance" "f5" {
   instance_type          = "m5.xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "F5"
@@ -172,7 +172,7 @@ resource "aws_instance" "RHEL9_web_A" {
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "RHEL9_web_A"
@@ -186,7 +186,7 @@ resource "aws_instance" "RHEL9_web_C" {
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "RHEL9_web_C"
@@ -200,7 +200,7 @@ resource "aws_instance" "win25" {
   instance_type          = "m5.xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
   user_data              = file("scripts/win25_userdata")
 
   tags = {
@@ -216,7 +216,7 @@ resource "aws_instance" "satellite" {
   instance_type          = "m5.2xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "Satellite"
@@ -230,7 +230,7 @@ resource "aws_instance" "panos" {
   instance_type          = "c5n.xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "Panos"
@@ -244,7 +244,7 @@ resource "aws_instance" "idm" {
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "Identity Management"
@@ -258,7 +258,7 @@ resource "aws_instance" "vault" {
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "Vault"
@@ -272,7 +272,7 @@ resource "aws_instance" "hashicorp" {
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_c.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "HashiCorp"
@@ -286,7 +286,7 @@ resource "aws_instance" "infoblox" {
   instance_type          = "m5.xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "my_public_ssh_key"
+  key_name               = "my_public_ssh_key_tf"
 
   tags = {
     Name        = "Infoblox"
