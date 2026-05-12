@@ -64,12 +64,7 @@ ansible-playbook playbooks/main.yml --tags remove
 
 ## Terraform CLI Development
 
-`terraform_cli/` contains standalone TF configs for iterating locally without AAP. Set AWS credentials first:
-
-```bash
-export AWS_ACCESS_KEY_ID=...
-export AWS_SECRET_ACCESS_KEY=...
-```
+`terraform_cli/` contains standalone TF configs for iterating locally without AAP. Credentials are loaded from `.envrc` (gitignored) via direnv when you `cd` into the repo. See `terraform_cli/README.md` for first-time setup; `.envrc.example` at repo root is the template.
 
 Then use standard Terraform workflow:
 ```bash
