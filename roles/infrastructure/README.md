@@ -20,7 +20,7 @@ aws_profile: default                        # aws profile name from ~/.aws/crede
 aws_ami: ami-0a5229853eaaa29c1              # Red Hat Enterprise Linux version 10 (HVM), EBS General Purpose (SSD) Volume Type
 aws_type: m7i.xlarge                        # 4 vCPUs, 16 GiB RAM 4g EPYC
 aws_domain: "{{ domain_name }}"
-aws_region: us-west-1
+aws_region: us-east-1
 my_s3_bucket_name: hashicorp-daily-demo-451
 tf_config_files:
   - main.tf
