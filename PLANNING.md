@@ -368,7 +368,6 @@ terraform destroy                # terminates instances
 | Question | Status |
 |----------|--------|
 | Containerlab role — does mlowcher have one? | Ask him |
-| AWS region — stay on us-west-1 or move to us-west-2? | us-west-1 current, us-west-2 has 4 AZs and better instance availability — low priority to change |
 | Satellite manifest API — exact RHSM API endpoint and allocation workflow | Needs a spike |
 | Vault unseal keys storage — confirmed going into ansible-vault file in remote vault | Confirmed |
 
@@ -392,6 +391,7 @@ terraform destroy                # terminates instances
 | ansible.platform vs ansible.controller | ansible.platform always | ansible.controller is legacy |
 | Terraform state strategy | S3 backend + DynamoDB lock | Replaces hand-rolled ZIP/providers archive; unifies AAP path and `terraform_cli/` onto one state file |
 | CIS image baseline | L1 for all RHEL | Matches `image.builder.pipeline` Phase 1 contract; Satellite host = L1 only; Layer 3 workloads start L1, add L2 per workload group once pipeline ships L2 lineage (see [#9](https://github.com/ericcames/demo.datacenter/issues/9)) |
+| AWS region | `us-east-1` | Pipeline default; 6 AZs (vs us-west-1's 2); broadest instance and marketplace AMI availability; eliminates cross-region AMI dance with `image.builder.pipeline` (see [#16](https://github.com/ericcames/demo.datacenter/issues/16)) |
 
 ---
 

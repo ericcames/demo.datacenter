@@ -54,7 +54,7 @@ ansible-playbook playbooks/main.yml --tags remove
 
 **AAP environment variables**: The infrastructure role asserts that `CONTROLLER_HOST`, `CONTROLLER_USERNAME`, and `CONTROLLER_PASSWORD` are set (injected by AAP credentials). Do not hardcode these.
 
-**Terraform state persistence**: TF config files are templated at runtime and pushed to the S3 bucket (`demo-datacenter-451-eca`, `us-west-1`). The `.terraform/` providers directory is zipped and stored in S3 so the `remove` tag can reconstruct state without re-running `terraform init` against a network.
+**Terraform state persistence**: TF config files are templated at runtime and pushed to the S3 bucket (`demo-datacenter-451-eca`, `us-east-1`). The bucket is created fresh per demo and torn down by a 6pm-local scheduled job. The `.terraform/` providers directory is zipped and stored in S3 so the `remove` tag can reconstruct state without re-running `terraform init` against a network.
 
 ## Collection Conventions
 
@@ -80,7 +80,7 @@ terraform destroy
 To find AMI IDs:
 ```bash
 aws ec2 describe-images --query 'reverse(sort_by(Images, &CreationDate))[].[Name, ImageId, CreationDate]' \
-  --filters 'Name=name,Values=F5*BIGIP-*' --output table --region us-west-1
+  --filters 'Name=name,Values=F5*BIGIP-*' --output table --region us-east-1
 ```
 
 ## Installing Collections
