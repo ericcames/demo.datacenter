@@ -211,8 +211,8 @@ resource "aws_instance" "win25" {
 }
 
 resource "aws_instance" "satellite" {
-  # RHEL 10
-  ami                    = data.aws_ami.rhel10.id
+  # RHEL 9 — Satellite 6.18 supports RHEL 9, not RHEL 10
+  ami                    = data.aws_ami.rhel9.id
   instance_type          = "m5.2xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
