@@ -9,10 +9,6 @@
       ansible.builtin.hostname:
         name: "{{ inventory_hostname }}"
 
-    - name: Debug
-      ansible.builtin.debug:
-        msg: "{{ rh_activation_key }} and {{ rh_org_id }}"
-
     - name: Register and subscribe the system
       vars:
         rhc_auth:

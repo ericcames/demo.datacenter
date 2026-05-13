@@ -1,0 +1,11 @@
+---
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.96.1
+    hooks:
+      - id: terraform_fmt
+        files: ^terraform_cli/
+      - id: terraform_validate
+        args:
+          - --args=-backend=false
+        files: ^terraform_cli/

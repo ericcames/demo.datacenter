@@ -14,6 +14,10 @@ This project does not yet follow Semantic Versioning; entries are grouped under
 - Initial `CLAUDE.md` (project instructions for Claude Code) and `PLANNING.md` (strategy / decision log) ([#5](https://github.com/ericcames/demo.datacenter/pull/5)).
 - Opus-review assessment of `PLANNING.md` and `CLAUDE.md` committed under `docs/` ([#7](https://github.com/ericcames/demo.datacenter/pull/7)).
 
+### Added
+- `.github/workflows/terraform.yml` — CI runs `terraform fmt -check` + `terraform init -backend=false` + `terraform validate` on both `terraform_cli/` and a rendered copy of `roles/infrastructure/templates/*.tf.j2` on every PR touching Terraform files (closes [#11](https://github.com/ericcames/demo.datacenter/issues/11)).
+- `.pre-commit-config.yaml` — mirrors CI checks locally via `antonbabenko/pre-commit-terraform`; install with `pip install pre-commit && pre-commit install`.
+
 ### Removed
 - Ubuntu AMI data source (`data "aws_ami" "ubuntu"`) and `aws_instance.app_server` dropped from both `terraform_cli/` and `roles/infrastructure/templates/`; Containerlab will run on RHEL (closes [#18](https://github.com/ericcames/demo.datacenter/issues/18)).
 
@@ -25,5 +29,6 @@ This project does not yet follow Semantic Versioning; entries are grouped under
 - `terraform_cli/README.md` rewritten to walk through the direnv install → hook → `.envrc allow` workflow; inline access-key example removed from `CLAUDE.md` ([#24](https://github.com/ericcames/demo.datacenter/pull/24)).
 
 ### Fixed
+- `roles/rhsm/tasks/main.yml` debug task that printed `rh_activation_key` and `rh_org_id` in plaintext removed (closes [#Bug-2](https://github.com/ericcames/demo.datacenter/blob/main/docs/reviews/opus-review-2026-05-05.md)).
 - `terraform_cli/main.tf` subnets `public_a`/`public_c` AZs pinned to `us-east-1a`/`us-east-1c` respectively; previously unset, AWS could assign `us-east-1e` which does not support `m5.2xlarge` (Satellite) causing `terraform apply` to fail ([#14](https://github.com/ericcames/demo.datacenter/pull/14)).
 - `terraform_cli/main.tf` `aws_instance.key_name` references updated from `"my_public_ssh_key"` to `"my_public_ssh_key_tf"` (11 occurrences). Completes the rename started in `8adaf67` so a fresh-account `terraform apply` no longer fails on missing key ([#25](https://github.com/ericcames/demo.datacenter/pull/25), closes [#22](https://github.com/ericcames/demo.datacenter/issues/22)).
