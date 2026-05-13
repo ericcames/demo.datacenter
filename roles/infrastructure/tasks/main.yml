@@ -50,7 +50,22 @@
       ansible.builtin.include_vars:
         file: "{{ playbook_dir }}/remotevault.yml"
 
-    - name: Create an S3 bucket for out main.tf
+    - name: Assert S3 bucket name includes SE-specific suffix (prevents cross-SE state collisions)
+      ansible.builtin.assert:
+        that:
+          - my_s3_bucket_name | regex_search('^demo-datacenter-.+-.+$')
+        fail_msg: >
+          my_s3_bucket_name '{{ my_s3_bucket_name }}' must follow the pattern
+          demo-datacenter-<account-id>-<initials> to prevent cross-SE state collisions.
+
+    - name: Pre-flight — remove any stale S3 state bucket
+      amazon.aws.s3_bucket:
+        region: "{{ aws_region }}"
+        name: "{{ my_s3_bucket_name }}"
+        state: absent
+        force: true
+
+    - name: Create S3 state bucket
       amazon.aws.s3_bucket:
         region: "{{ aws_region }}"
         name: "{{ my_s3_bucket_name }}"
@@ -96,19 +111,6 @@
       when: debug | default(false)
       ansible.builtin.debug:
         var: tf_hosts_result
-
-    - name: Create a zip archive of a directory
-      community.general.archive:
-        path: "{{ playbook_dir }}/.terraform" # The directory you want to zip
-        dest: "{{ playbook_dir }}/terraform.zip" # The destination path and filename for the zip file
-        format: zip
-
-    - name: PUT my archived /.terraform/providers/ into s3
-      amazon.aws.s3_object:
-        bucket: "{{ my_s3_bucket_name }}"
-        object: development/terraform.zip
-        src: "{{ playbook_dir }}/terraform.zip"
-        mode: put
 
     - name: Refresh my inventory
       ansible.controller.inventory_source_update:
@@ -157,17 +159,6 @@
         object: "{{ item['object'] }}"
         dest: "{{ playbook_dir }}/{{ item['name'] }}"
         mode: get
-
-    - name: Create a directory if it does not exist
-      ansible.builtin.file:
-        path: "{{ playbook_dir }}/.terraform"
-        state: directory
-        mode: '0700'
-
-    - name: Extract providers
-      ansible.builtin.unarchive:
-        src: "{{ playbook_dir }}/terraform.zip"
-        dest: "{{ playbook_dir }}/"
 
     - name: Destroy hosts in AWS
       register: tf_hosts_result

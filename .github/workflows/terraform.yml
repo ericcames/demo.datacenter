@@ -20,7 +20,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "~> 1.9"
+          terraform_version: "~> 1.10"
 
       - name: Format check
         run: terraform fmt -check -recursive .
@@ -43,7 +43,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "~> 1.9"
+          terraform_version: "~> 1.10"
 
       - name: Render J2 templates (substitute Jinja2 vars with dummy values)
         run: |
@@ -51,8 +51,10 @@ jobs:
           for f in roles/infrastructure/templates/*.tf.j2; do
             sed -E 's/\{\{[^}]+\}\}/dummy/g' "$f" > "/tmp/tf-templates/$(basename "$f" .j2)"
           done
-          # variables, outputs, and providers are shared with terraform_cli/ (not templated)
-          cp terraform_cli/variables.tf terraform_cli/terraform.tf terraform_cli/outputs.tf /tmp/tf-templates/
+          # variables and outputs are shared with terraform_cli/ (not templated)
+          cp terraform_cli/variables.tf terraform_cli/outputs.tf /tmp/tf-templates/
+          # Use the role's static terraform.tf (providers only) — backend is already in backend.tf.j2
+          cp roles/infrastructure/files/terraform.tf /tmp/tf-templates/
           # win25 userdata is rendered at runtime; provide a dummy so file() resolves
           touch /tmp/tf-templates/win25_userdata_nopasswd
 

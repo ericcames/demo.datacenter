@@ -1,9 +1,5 @@
 ---
 s3_files:
-  - name: terraform.zip
-    object: development/terraform.zip
-  - name: terraform.tfstate
-    object: development/terraform.tfstate
   - name: main.tf
     object: development/main.tf
   - name: backend.tf

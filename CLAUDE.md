@@ -30,7 +30,7 @@ DC1 is built in layers:
 
 ## Roles
 
-- **infrastructure** — Provisions AWS instances via Terraform. Uploads generated TF configs to S3, runs `community.general.terraform`, then stores `.terraform/providers` as a zip in S3 so destroy runs can retrieve them later.
+- **infrastructure** — Provisions AWS instances via Terraform. Renders TF configs from Jinja2 templates, uploads them to S3, and runs `community.general.terraform`. State lives in the S3 backend (`backend.tf.j2`); destroy runs re-download configs from S3 and run `terraform init` to reconnect to the backend.
 - **satellite** — Installs Satellite 6.18 on RHEL 9, uploads manifest, creates lifecycle environments (Library → Development → QA → Production), content views, activation keys, and hostgroups.
 - **rhsm** — Registers hosts with Red Hat subscription manager. Requires `rh_activation_key` and `rh_org_id` from vault.
 - **remote_vault** — Fetches a remote vault file from `{{ my_remote_vault }}` URL and loads it with `include_vars`. Used in every play that needs secrets.
@@ -54,7 +54,7 @@ ansible-playbook playbooks/main.yml --tags remove
 
 **AAP environment variables**: The infrastructure role asserts that `CONTROLLER_HOST`, `CONTROLLER_USERNAME`, and `CONTROLLER_PASSWORD` are set (injected by AAP credentials). Do not hardcode these.
 
-**Terraform state persistence**: TF config files are templated at runtime and pushed to the S3 bucket (`demo-datacenter-451-eca`, `us-east-1`). The bucket is created fresh per demo and torn down by a 6pm-local scheduled job. The `.terraform/` providers directory is zipped and stored in S3 so the `remove` tag can reconstruct state without re-running `terraform init` against a network.
+**Terraform state persistence**: Both the AAP path and `terraform_cli/` share a single S3 backend (`backend.tf.j2`; `backend "s3" {}` in `terraform_cli/terraform.tf`). State key is `demo-datacenter/terraform.tfstate`; locking uses `use_lockfile = true` (Terraform ≥ 1.10, no DynamoDB required). The S3 bucket is created fresh at the start of every `--tags create` run (pre-flight delete ensures no stale state) and torn down at the end of `--tags remove`. For `terraform_cli/`, set `MY_S3_BUCKET_NAME` and `TF_CLI_ARGS_init` in `.envrc` (see `.envrc.example`).
 
 ## Collection Conventions
 
@@ -100,6 +100,6 @@ ansible-galaxy collection install -r collections/requirements.yml -p ./collectio
 
 ## What Not to Commit
 
-`.gitignore` excludes: `.terraform/`, `*.tfstate`, `*.tfvars`, `win25_userdata`. State files are per-developer; for shared state, see issue #10 (S3 backend + DynamoDB lock).
+`.gitignore` excludes: `.terraform/`, `*.tfstate`, `*.tfvars`, `win25_userdata`. State is managed by the S3 backend; no local state files should be committed.
 
 Images belong in `docs/images/` and must be committed (not gitignored) so they render on GitHub.
