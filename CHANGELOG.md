@@ -14,6 +14,9 @@ This project does not yet follow Semantic Versioning; entries are grouped under
 - Initial `CLAUDE.md` (project instructions for Claude Code) and `PLANNING.md` (strategy / decision log) ([#5](https://github.com/ericcames/demo.datacenter/pull/5)).
 - Opus-review assessment of `PLANNING.md` and `CLAUDE.md` committed under `docs/` ([#7](https://github.com/ericcames/demo.datacenter/pull/7)).
 
+### Removed
+- Ubuntu AMI data source (`data "aws_ami" "ubuntu"`) and `aws_instance.app_server` dropped from both `terraform_cli/` and `roles/infrastructure/templates/`; Containerlab will run on RHEL (closes [#18](https://github.com/ericcames/demo.datacenter/issues/18)).
+
 ### Changed
 - `terraform_cli/data.tf` RHEL 9 AMI source switched from Red Hat official AMIs to CIS-hardened AMIs built by `image.builder.pipeline`; owner pinned to `463606842039` (Red Hat Image Builder service account) with tag filters `Pipeline=image-builder-pipeline`, `OS=rhel9`, `CIS-Level=L1` ([#14](https://github.com/ericcames/demo.datacenter/pull/14), closes [#9](https://github.com/ericcames/demo.datacenter/issues/9)).
 - `terraform_cli/main.tf` `aws_instance.satellite` AMI source corrected from `rhel10` to `rhel9`; Satellite 6.18 requires RHEL 9 ([#14](https://github.com/ericcames/demo.datacenter/pull/14)).

@@ -137,20 +137,6 @@ module "key_pair" {
   public_key = data.http.my_file.response_body
 }
 
-resource "aws_instance" "app_server" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
-  subnet_id              = aws_subnet.public_a.id
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "{{ ssh_key_name }}"
-
-  tags = {
-    Name        = "Ubuntu"
-    Application = "Ubuntu"
-    Environment = "development"
-  }
-}
-
 resource "aws_instance" "f5" {
   ami                    = data.aws_ami.f5_21.id
   instance_type          = "m5.xlarge"

@@ -141,7 +141,7 @@ Cost: pennies per day. Leave this up permanently.
 | F5 BIG-IP | m5.xlarge | $4.61 | F5 / network automation |
 | Palo Alto NGFW | c5n.xlarge | $5.18 | Network security |
 | Infoblox | m5.xlarge | $4.61 | DNS/IPAM automation |
-| Ubuntu (Containerlab) | t2.medium+ | ~$1.00 | Network device emulation |
+| RHEL (Containerlab) | t2.medium+ | ~$1.00 | Network device emulation |
 | Red Hat IdM | t2.micro | $0.28 | IdM + AD trust |
 | HashiCorp Enterprise | t2.micro | $0.28 | Enterprise Terraform/Vault |
 
@@ -214,11 +214,11 @@ This makes Satellite setup fully self-contained and reproducible with no manual 
 
 ---
 
-## Network Device Emulation (Ubuntu / Containerlab)
+## Network Device Emulation (RHEL / Containerlab)
 
-The Ubuntu node exists to run **Containerlab** — a tool that spins up containerized network
-devices (routers, switches, firewalls) on a single Linux host. This allows network
-automation demos without requiring additional physical or virtual appliances.
+The Containerlab node runs on RHEL 9 — consistent with the rest of DC1 so it is
+Satellite-managed, Insights-visible, and IdM-joinable. Containerlab supports RHEL; there
+is no functional regression from dropping Ubuntu.
 
 Teammate **mlowcher** ([GitLab](https://gitlab.com/users/mlowcher) /
 [GitHub](https://github.com/mlowcher61)) may have already developed a Containerlab setup
@@ -336,7 +336,7 @@ terraform destroy                # terminates instances
 
 ### Phase 4 — Layer 3 + Layer 4
 
-12. **Containerlab role** — Ubuntu node setup; confirm/reuse mlowcher's work if available
+12. **Containerlab role** — RHEL node setup; confirm/reuse mlowcher's work if available
 13. **RHEL workload nodes** — Satellite-managed, joined to `dc1.lab` DNS
 14. **Windows workload nodes** — AD-joined, managed via AAP
 15. **Demo story playbooks** — Linux patching, Windows management, network automation,
@@ -367,7 +367,7 @@ terraform destroy                # terminates instances
 
 | Question | Status |
 |----------|--------|
-| Containerlab role — does mlowcher have one? | Ask him |
+| Containerlab role — does mlowcher have one? | Ask him (RHEL node, not Ubuntu) |
 | Satellite manifest API — exact RHSM API endpoint and allocation workflow | Needs a spike |
 | Vault unseal keys storage — confirmed going into ansible-vault file in remote vault | Confirmed |
 
@@ -386,6 +386,7 @@ terraform destroy                # terminates instances
 | Nightly OS shutdown | Remove it | AWS stop/start handles cost; shutdown is redundant |
 | Satellite manifest | API-based generation | Committed zip is expired; API is repeatable |
 | Network emulation tool | Containerlab | Best Ansible integration, container-based |
+| Containerlab host OS | RHEL 9 | Platform consistency (Satellite-managed, Insights-visible, IdM-joinable); one less OS family; no confirmation from Mark that Ubuntu is needed for Cisco demos ([#18](https://github.com/ericcames/demo.datacenter/issues/18)) |
 | Vault vs HashiCorp Enterprise | Vault is higher priority | Core demo story: secrets in Vault, not AAP |
 | Stop vs terminate/recreate | Stop/start | Preserves configured disk state; restart in minutes not hours |
 | ansible.platform vs ansible.controller | ansible.platform always | ansible.controller is legacy |
