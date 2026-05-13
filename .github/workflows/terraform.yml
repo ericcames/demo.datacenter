@@ -28,6 +28,10 @@ jobs:
       - name: Init
         run: terraform init -backend=false
 
+      - name: Create stubs for gitignored runtime files
+        run: mkdir -p scripts && touch scripts/win25_userdata
+        working-directory: terraform_cli
+
       - name: Validate
         run: terraform validate
 
