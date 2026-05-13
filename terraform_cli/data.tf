@@ -44,7 +44,11 @@ data "aws_ami" "rhel8" {
 
 data "aws_ami" "rhel9" {
   most_recent = true
-  owners      = ["self"]
+  # Red Hat Image Builder builds AMIs in its own service account (463606842039)
+  # and shares them with the consumer via `share_with_accounts`. The AMI is never
+  # owned by us, so `owners = ["self"]` would never match. See
+  # image.builder.pipeline/docs/design.md §9.1 for the contract.
+  owners = ["463606842039"]
 
   filter {
     name   = "tag:Pipeline"
