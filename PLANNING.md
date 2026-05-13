@@ -248,6 +248,11 @@ The Windows Server 2025 node is already provisioned by Terraform (tagged `ad`, `
 The WinRM group vars are already set in the infrastructure role. What is missing is the
 Ansible role to configure it.
 
+**Hardening approach:** Marketplace Windows Server 2025 AMI is used as-is. Post-AD-join,
+Group Policy Objects (GPOs) enforce the security baseline — this is the standard Windows
+hardening model and appropriate for the demo audience. CIS-hardened Windows AMIs from
+`image.builder.pipeline` are deferred to Phase 3 of that pipeline (see [#19](https://github.com/ericcames/demo.datacenter/issues/19)).
+
 The `active_directory` role needs to:
 1. Promote the Windows Server to a Domain Controller for `dc1.lab`
 2. Configure AD DNS to serve the `dc1.lab` zone
@@ -387,6 +392,7 @@ terraform destroy                # terminates instances
 | Satellite manifest | API-based generation | Committed zip is expired; API is repeatable |
 | Network emulation tool | Containerlab | Best Ansible integration, container-based |
 | Containerlab host OS | RHEL 9 | Platform consistency (Satellite-managed, Insights-visible, IdM-joinable); one less OS family; no confirmation from Mark that Ubuntu is needed for Cisco demos ([#18](https://github.com/ericcames/demo.datacenter/issues/18)) |
+| Windows CIS hardening | Deferred — GPO post-join | AD-joined Windows hosts get hardening from GPOs regardless of pre-image baseline; `image.builder.pipeline` targets Windows in Phase 3 (Server 2022, not 2025); demo audience is general enterprise, not federal/regulated ([#19](https://github.com/ericcames/demo.datacenter/issues/19)) |
 | Vault vs HashiCorp Enterprise | Vault is higher priority | Core demo story: secrets in Vault, not AAP |
 | Stop vs terminate/recreate | Stop/start | Preserves configured disk state; restart in minutes not hours |
 | ansible.platform vs ansible.controller | ansible.platform always | ansible.controller is legacy |

@@ -15,6 +15,7 @@ This project does not yet follow Semantic Versioning; entries are grouped under
 - Opus-review assessment of `PLANNING.md` and `CLAUDE.md` committed under `docs/` ([#7](https://github.com/ericcames/demo.datacenter/pull/7)).
 
 ### Added
+- `PLANNING.md` Resolved Decisions: document Windows CIS hardening deferral — marketplace Windows Server 2025 AMI + GPO post-join is the standing approach; pipeline Phase 3 is the revisit trigger (closes [#19](https://github.com/ericcames/demo.datacenter/issues/19)).
 - `.github/workflows/terraform.yml` — CI runs `terraform fmt -check` + `terraform init -backend=false` + `terraform validate` on both `terraform_cli/` and a rendered copy of `roles/infrastructure/templates/*.tf.j2` on every PR touching Terraform files (closes [#11](https://github.com/ericcames/demo.datacenter/issues/11)).
 - `.pre-commit-config.yaml` — mirrors CI checks locally via `antonbabenko/pre-commit-terraform`; install with `pip install pre-commit && pre-commit install`.
 
