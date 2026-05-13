@@ -53,3 +53,17 @@ Satellite
 =========
 
 ![alt text](https://github.com/ericcames/demo.datacenter/blob/main/docs/images/dc1satellite.png "Satellite")
+
+Local Development — Pre-commit Hooks
+=========
+Pre-commit hooks mirror the CI checks (terraform fmt + terraform validate) so issues are caught before push.
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+To run manually against all files:
+```bash
+pre-commit run --all-files
+```

@@ -1,0 +1,65 @@
+---
+name: Terraform
+
+on:
+  pull_request:
+    paths:
+      - "terraform_cli/**"
+      - "roles/infrastructure/templates/**.tf.j2"
+  workflow_dispatch:
+
+jobs:
+  terraform-cli:
+    name: Validate terraform_cli
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform_cli
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.9"
+
+      - name: Format check
+        run: terraform fmt -check -recursive .
+
+      - name: Init
+        run: terraform init -backend=false
+
+      - name: Create stubs for gitignored runtime files
+        run: mkdir -p scripts && touch scripts/win25_userdata
+        working-directory: terraform_cli
+
+      - name: Validate
+        run: terraform validate
+
+  terraform-templates:
+    name: Validate J2 templates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.9"
+
+      - name: Render J2 templates (substitute Jinja2 vars with dummy values)
+        run: |
+          mkdir -p /tmp/tf-templates
+          for f in roles/infrastructure/templates/*.tf.j2; do
+            sed -E 's/\{\{[^}]+\}\}/dummy/g' "$f" > "/tmp/tf-templates/$(basename "$f" .j2)"
+          done
+          # variables, outputs, and providers are shared with terraform_cli/ (not templated)
+          cp terraform_cli/variables.tf terraform_cli/terraform.tf terraform_cli/outputs.tf /tmp/tf-templates/
+          # win25 userdata is rendered at runtime; provide a dummy so file() resolves
+          touch /tmp/tf-templates/win25_userdata_nopasswd
+
+      - name: Init
+        run: terraform init -backend=false
+        working-directory: /tmp/tf-templates
+
+      - name: Validate
+        run: terraform validate
+        working-directory: /tmp/tf-templates
