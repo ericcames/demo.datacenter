@@ -15,6 +15,7 @@ This project does not yet follow Semantic Versioning; entries are grouped under
 - Opus-review assessment of `PLANNING.md` and `CLAUDE.md` committed under `docs/` ([#7](https://github.com/ericcames/demo.datacenter/pull/7)).
 
 ### Added
+- `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `.github/SECURITY.md`, `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/bug_report.md`, `.github/ISSUE_TEMPLATE/feature_request.md` — community and contribution standards adapted from `image.builder.pipeline`.
 - `PLANNING.md` Resolved Decisions: document Windows CIS hardening deferral
 
 ### Changed
