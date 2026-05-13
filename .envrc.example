@@ -9,3 +9,8 @@ export AWS_DEFAULT_REGION=us-east-1
 # Alternative: if you already use a named profile in ~/.aws/credentials,
 # comment out the two access-key lines above and uncomment this instead:
 # export AWS_PROFILE=your-profile-name
+
+# Terraform S3 backend — naming convention: demo-datacenter-<account-id-fragment>-<initials>
+# Must match my_s3_bucket_name in roles/infrastructure/vars/main.yml
+export MY_S3_BUCKET_NAME=demo-datacenter-ACCOUNTID-INITIALS
+export TF_CLI_ARGS_init="-backend-config=bucket=${MY_S3_BUCKET_NAME} -backend-config=key=demo-datacenter/terraform.tfstate -backend-config=region=us-east-1 -backend-config=use_lockfile=true"

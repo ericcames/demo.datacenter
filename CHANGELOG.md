@@ -15,7 +15,14 @@ This project does not yet follow Semantic Versioning; entries are grouped under
 - Opus-review assessment of `PLANNING.md` and `CLAUDE.md` committed under `docs/` ([#7](https://github.com/ericcames/demo.datacenter/pull/7)).
 
 ### Added
-- `PLANNING.md` Resolved Decisions: document Windows CIS hardening deferral — marketplace Windows Server 2025 AMI + GPO post-join is the standing approach; pipeline Phase 3 is the revisit trigger (closes [#19](https://github.com/ericcames/demo.datacenter/issues/19)).
+- `PLANNING.md` Resolved Decisions: document Windows CIS hardening deferral
+
+### Changed
+- Terraform state migrated to native S3 backend with `use_lockfile = true` (Terraform ≥ 1.10); eliminates hand-rolled `.terraform/` ZIP archive pattern. Both AAP path and `terraform_cli/` share one state file (closes [#10](https://github.com/ericcames/demo.datacenter/issues/10)).
+- `roles/infrastructure/tasks/main.yml` pre-flight: stale S3 bucket deleted before fresh creation — prevents `BucketAlreadyOwnedByYou` from failed teardowns (closes [#17](https://github.com/ericcames/demo.datacenter/issues/17)).
+- SE-identity collision guard: `my_s3_bucket_name` must match `demo-datacenter-<id>-<initials>` or provisioning fails fast.
+- `.envrc.example` documents `MY_S3_BUCKET_NAME` and `TF_CLI_ARGS_init` for local S3 backend configuration.
+- `required_version` bumped `>= 1.2` → `>= 1.10`; CI workflow pinned to `~> 1.10`. — marketplace Windows Server 2025 AMI + GPO post-join is the standing approach; pipeline Phase 3 is the revisit trigger (closes [#19](https://github.com/ericcames/demo.datacenter/issues/19)).
 - `.github/workflows/terraform.yml` — CI runs `terraform fmt -check` + `terraform init -backend=false` + `terraform validate` on both `terraform_cli/` and a rendered copy of `roles/infrastructure/templates/*.tf.j2` on every PR touching Terraform files (closes [#11](https://github.com/ericcames/demo.datacenter/issues/11)).
 - `.pre-commit-config.yaml` — mirrors CI checks locally via `antonbabenko/pre-commit-terraform`; install with `pip install pre-commit && pre-commit install`.
 

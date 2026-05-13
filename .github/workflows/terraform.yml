@@ -20,7 +20,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "~> 1.9"
+          terraform_version: "~> 1.10"
 
       - name: Format check
         run: terraform fmt -check -recursive .
@@ -43,7 +43,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "~> 1.9"
+          terraform_version: "~> 1.10"
 
       - name: Render J2 templates (substitute Jinja2 vars with dummy values)
         run: |
