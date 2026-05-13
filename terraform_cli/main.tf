@@ -14,7 +14,7 @@ resource "aws_vpc" "main" {
 resource "aws_subnet" "public_a" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.1.0/24"
-  # availability_zone       = "us-east-1a"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
   tags = {
     Name = "public-subnet-a"
@@ -24,7 +24,7 @@ resource "aws_subnet" "public_a" {
 resource "aws_subnet" "public_c" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.2.0/24"
-  # availability_zone       = "us-east-1c"
+  availability_zone       = "us-east-1c"
   map_public_ip_on_launch = true
   tags = {
     Name = "public-subnet-c"
@@ -211,8 +211,8 @@ resource "aws_instance" "win25" {
 }
 
 resource "aws_instance" "satellite" {
-  # RHEL 10
-  ami                    = data.aws_ami.rhel10.id
+  # RHEL 9 — Satellite 6.18 supports RHEL 9, not RHEL 10
+  ami                    = data.aws_ami.rhel9.id
   instance_type          = "m5.2xlarge"
   subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
